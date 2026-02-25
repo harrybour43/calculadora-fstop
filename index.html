@@ -5,23 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de F-Stop</title>
     <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --container-bg: #fff;
+            --text-color: #333;
+            --border-color: #ccc;
+            --btn-bg: #0056b3;
+            --btn-hover: #004494;
+            --result-bg: #e9ecef;
+            --action-bg: #fdf2f2;
+            --action-text: #c9302c;
+            --action-border: #d9534f;
+            --input-bg: #fff;
+            --input-text: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #444;
+            --btn-bg: #375a7f;
+            --btn-hover: #2b4764;
+            --result-bg: #2c2c2c;
+            --action-bg: #4a1c1c;
+            --action-text: #ff8a8a;
+            --action-border: #ff5252;
+            --input-bg: #333;
+            --input-text: #e0e0e0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
-            background: #fff;
+            background: var(--container-bg);
             padding: 20px 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             max-width: 400px;
             width: 100%;
+            transition: background-color 0.3s;
         }
         h1 {
             font-size: 1.5rem;
@@ -37,33 +69,45 @@
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--input-text);
         }
         button {
-            background-color: #0056b3;
+            background-color: var(--btn-bg);
             color: white;
             border: none;
             cursor: pointer;
             font-weight: bold;
+            transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #004494;
+            background-color: var(--btn-hover);
+        }
+        .theme-btn {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .theme-btn:hover {
+            background-color: var(--result-bg);
         }
         .result {
             margin-top: 20px;
             padding: 15px;
-            background-color: #e9ecef;
-            border-left: 5px solid #0056b3;
+            background-color: var(--result-bg);
+            border-left: 5px solid var(--btn-bg);
             border-radius: 4px;
             font-size: 1.1rem;
             min-height: 50px;
         }
         .action-required {
-            border-left-color: #d9534f;
-            background-color: #fdf2f2;
-            color: #c9302c;
+            border-left-color: var(--action-border);
+            background-color: var(--action-bg);
+            color: var(--action-text);
             font-weight: bold;
         }
     </style>
@@ -71,6 +115,8 @@
 <body>
 
 <div class="container">
+    <button id="themeToggle" class="theme-btn" onclick="toggleTheme()">Ativar Modo Escuro</button>
+
     <h1>Calculadora de F-Stop</h1>
     
     <label for="baseStop">F-Stop Base (Fotômetro):</label>
@@ -111,7 +157,21 @@
 </div>
 
 <script>
-    // Tabela de f-stops: Ponto Inteiro, 1º Terço, 2º Terço, Próximo Inteiro
+    // Alternar tema
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('themeToggle');
+        
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            btn.innerText = 'Ativar Modo Escuro';
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            btn.innerText = 'Ativar Modo Claro';
+        }
+    }
+
+    // Tabela de f-stops
     const fStops = [
         { f: '1.0', t1: '1.1', t2: '1.2', next: '1.4' },
         { f: '1.4', t1: '1.6', t2: '1.8', next: '2.0' },
@@ -178,3 +238,4 @@
 
 </body>
 </html>
+ 
