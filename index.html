@@ -110,6 +110,15 @@
             color: var(--action-text);
             font-weight: bold;
         }
+        .footer-credits {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -154,10 +163,13 @@
     <div id="resultBox" class="result">
         Aguardando cálculo...
     </div>
+
+    <div class="footer-credits">
+        Desenvolvido por Harry Bour para turma SCI-TPF43M
+    </div>
 </div>
 
 <script>
-    // Alternar tema
     function toggleTheme() {
         const body = document.body;
         const btn = document.getElementById('themeToggle');
@@ -171,7 +183,6 @@
         }
     }
 
-    // Tabela de f-stops
     const fStops = [
         { f: '1.0', t1: '1.1', t2: '1.2', next: '1.4' },
         { f: '1.4', t1: '1.6', t2: '1.8', next: '2.0' },
@@ -238,4 +249,3 @@
 
 </body>
 </html>
- 
