@@ -3,258 +3,634 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de F-Stop Multi-Luz</title>
+    <title>Hub TPF43M - Senac Lapa Scipião</title>
     <style>
+        /* ==========================================
+           1. VARIÁVEIS GERAIS E TEMA ESCURO (PADRÃO)
+           ========================================== */
         :root {
-            --bg-color: #f4f4f9;
-            --container-bg: #fff;
-            --text-color: #333;
-            --border-color: #ccc;
-            --btn-bg: #0056b3;
-            --btn-hover: #004494;
-            --btn-secondary: #6c757d;
-            --result-bg: #e9ecef;
-            --action-bg: #fdf2f2;
-            --action-text: #c9302c;
-            --input-bg: #fff;
-            --input-text: #333;
-            --highlight: #28a745;
-        }
-
-        [data-theme="dark"] {
             --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --border-color: #444;
-            --btn-bg: #375a7f;
-            --btn-hover: #2b4764;
-            --btn-secondary: #495057;
-            --result-bg: #2c2c2c;
-            --action-bg: #4a1c1c;
-            --action-text: #ff8a8a;
-            --input-bg: #333;
-            --input-text: #e0e0e0;
-            --highlight: #218838;
+            --bg-panel: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --accent-senac: #f26e22; /* Laranja Senac aproximado */
+            --accent-calc: #0056b3;
+            --accent-aulas: #4caf50;
+            --accent-eventos: #9c27b0;
+            --border-color: #333;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.3s, color 0.3s;
+            color: var(--text-main);
             margin: 0;
-        }
-        .container {
-            background: var(--container-bg);
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 800px;
-            width: 100%;
-        }
-        h1 { text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
-        
-        .light-row {
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            background-color: var(--result-bg);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .light-row.principal {
-            border-color: var(--highlight);
-            border-left: 5px solid var(--highlight);
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        select, button {
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            color: var(--input-text);
-        }
+        /* Oculta elementos na interface */
+        .hidden { display: none !important; }
 
-        .nudge-btns {
-            display: flex;
-            gap: 5px;
-        }
-
-        .nudge-btns button {
-            background-color: var(--btn-secondary);
-            color: white;
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 5px 8px;
-        }
-
-        .btn-add {
-            background-color: var(--highlight);
-            color: white;
-            cursor: pointer;
-            margin-bottom: 20px;
-            width: 100%;
-            font-weight: bold;
-        }
-
-        .theme-btn {
+        /* Botão genérico de voltar */
+        .btn-voltar {
             background-color: transparent;
-            color: var(--text-color);
-            margin-bottom: 20px;
-            width: 100%;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 6px;
             cursor: pointer;
-        }
-
-        .result-text {
-            width: 100%;
-            margin-top: 10px;
-            font-size: 0.95rem;
+            margin-bottom: 20px;
             font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-voltar:hover { background-color: #2a2a2a; }
+
+        /* Contêiner das páginas */
+        .page-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding-bottom: 80px; /* Espaço pro footer */
         }
 
-        .footer-credits {
-            margin-top: 25px;
+        h1.page-title {
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 300;
             text-align: center;
-            font-size: 0.85rem;
-            opacity: 0.8;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
         }
+
+        /* ==========================================
+           2. TELA DE ABERTURA (SPLASH SCREEN)
+           ========================================== */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            padding: 20px;
+            box-sizing: border-box;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .splash-logo svg { width: 120px; height: auto; margin-bottom: 20px; }
+        .splash-title { font-size: 2.5rem; font-weight: bold; margin: 0; letter-spacing: 2px; }
+        .splash-subtitle { font-size: 1.2rem; color: var(--accent-senac); margin: 5px 0 30px 0; }
+        .splash-curso { font-size: 1.1rem; color: var(--text-muted); margin: 2px 0; }
+        .splash-turma { font-size: 1.4rem; font-weight: bold; color: #fff; margin: 10px 0; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 4px; display: inline-block;}
+        .splash-footer { position: absolute; bottom: 20px; font-size: 0.8rem; color: #666; }
+        .click-hint-splash { margin-top: 40px; font-size: 0.9rem; color: #555; animation: pulse 2s infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* ==========================================
+           3. MENU PRINCIPAL
+           ========================================== */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .menu-btn {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px 20px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .menu-btn:hover { transform: translateY(-3px); background-color: #2a2a2a; }
+        .menu-icon { font-size: 2rem; }
+        .menu-btn.btn-aulas { border-left: 5px solid var(--accent-aulas); }
+        .menu-btn.btn-calc { border-left: 5px solid var(--accent-calc); }
+        .menu-btn.btn-eventos { border-left: 5px solid var(--accent-eventos); }
+
+        /* ==========================================
+           4. PAINEL DE AULAS (Seus estilos originais)
+           ========================================== */
+        .search-box { background-color: var(--bg-panel); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--accent-senac); }
+        .search-box label { display: block; margin-bottom: 8px; font-weight: bold; color: #ccc; }
+        .search-box select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #444; background-color: #2c2c2c; color: white; font-size: 1em; }
+        .aulas-container { display: flex; flex-direction: column; gap: 15px; }
+        .card { background-color: var(--bg-panel); border-left: 5px solid var(--accent-aulas); padding: 20px; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+        .card.past { border-left-color: #888; opacity: 0.7; }
+        .card.today { border-left-color: #e91e63; background-color: #2a1b20; }
+        .card.next { border-left-color: #2196f3; }
+        .status { font-size: 0.85em; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; }
+        .past .status { color: #aaa; } .today .status { color: #ff4081; } .next .status { color: #64b5f6; }
+        .date { font-size: 1.2em; margin-bottom: 5px; color: #fff; }
+        .details { font-size: 1em; color: #ccc; }
+        .footer-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-panel); display: flex; justify-content: center; padding: 15px 10px; z-index: 100; box-sizing: border-box; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); }
+        .footer-nav-inner { display: flex; justify-content: space-between; width: 100%; max-width: 600px; gap: 5px; }
+        .footer-nav button { background-color: #2c2c2c; color: #ccc; border: 1px solid #444; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-weight: bold; }
+        .footer-nav button.active { background-color: var(--accent-aulas); color: white; border-color: var(--accent-aulas); }
+        
+        /* Modal Aulas */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: var(--bg-panel); border-top: 5px solid var(--accent-eventos); padding: 25px; border-radius: 12px; width: 100%; max-width: 500px; position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #aaa; font-size: 1.8em; cursor: pointer; }
+        .modal-header { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
+
+        /* ==========================================
+           5. CALCULADORA DE F-STOP (Estilos integrados)
+           ========================================== */
+        .btn-add-luz { background-color: var(--accent-calc); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; }
+        .light-row { border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius: 6px; background-color: var(--bg-panel); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .light-row.principal { border-left: 5px solid #28a745; border-color: #28a745; }
+        .light-row select, .light-row button { padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background-color: #333; color: white; }
+        .nudge-btns { display: flex; gap: 5px; }
+        .nudge-btns button { background-color: #495057; border: none; cursor: pointer; }
+        .result-text { width: 100%; margin-top: 10px; font-size: 0.95rem; font-weight: bold; }
+
+        /* ==========================================
+           6. EVENTOS (Estilos Simples)
+           ========================================== */
+        .evento-card { background-color: var(--bg-panel); border-left: 5px solid var(--accent-eventos); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .evento-data { color: var(--accent-eventos); font-weight: bold; font-size: 0.9em; margin-bottom: 5px; }
+        .evento-titulo { font-size: 1.2em; color: #fff; margin-bottom: 5px; }
+        .evento-desc { color: #ccc; font-size: 0.95em; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <button id="themeToggle" class="theme-btn" onclick="toggleTheme()">Ativar Modo Escuro</button>
+    <div id="splash-screen" onclick="dismissSplash()">
+        <div class="splash-logo">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,90 50,10 90,90" fill="#f26e22" />
+                <polygon points="50,10 90,90 65,90" fill="#d05a18" />
+                <polygon points="50,10 50,90 10,90" fill="#ff8c42" />
+            </svg>
+        </div>
+        <h1 class="splash-title">SENAC</h1>
+        <div class="splash-subtitle">Lapa - Scipião</div>
+        
+        <div class="splash-curso">Técnico em Processos Fotográficos</div>
+        <div class="splash-turma">Turma 43M</div>
+        <div class="splash-curso">SCI-TPF43M</div>
 
-    <h1>Estúdio: Mapa de Luz</h1>
-    
-    <button class="btn-add" onclick="addLight()">+ Adicionar Ponto de Luz (Máx 5)</button>
+        <div class="click-hint-splash">Toque em qualquer lugar para entrar</div>
 
-    <div id="lightsContainer">
+        <div class="splash-footer">
+            Versão 3.0 | Desenvolvido por Harry Bour
+        </div>
+    </div>
+
+    <div id="view-menu" class="view hidden">
+        <div id="main-menu">
+            <button class="menu-btn btn-aulas" onclick="switchView('view-aulas')">
+                <span class="menu-icon">📅</span> Crono de Aulas
+            </button>
+            <button class="menu-btn btn-calc" onclick="switchView('view-calc')">
+                <span class="menu-icon">🧮</span> Calculadora
+            </button>
+            <button class="menu-btn btn-eventos" onclick="switchView('view-eventos')">
+                <span class="menu-icon">📷</span> Eventos da Turma
+            </button>
+        </div>
+    </div>
+
+    <div id="view-aulas" class="view page-container hidden">
+        <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
+        
+        <h1 class="page-title" style="border-bottom-color: var(--accent-aulas);">Crono de Aulas</h1>
+
+        <div class="search-box">
+            <label for="filtroUC">Pesquisar datas por UC:</label>
+            <select id="filtroUC">
+                <option value="">-- Selecione uma UC para ver todas as datas --</option>
+            </select>
         </div>
 
-    <div class="footer-credits">
-        Desenvolvido por Harry Bour para turma SCI-TPF43M
+        <div class="aulas-container" id="painel-aulas"></div>
+        <div class="aulas-container" id="resultado-pesquisa" style="display: none;"></div>
+
+        <div class="footer-nav" id="rodape-semanas">
+            <div class="footer-nav-inner">
+                <button id="btn-passada" onclick="mudarSemana(-1)">Semana Passada</button>
+                <button id="btn-atual" class="active" onclick="mudarSemana(0)">Essa Semana</button>
+                <button id="btn-que-vem" onclick="mudarSemana(1)">Semana que Vem</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    const fStopsFull = ['f/1.0', 'f/1.4', 'f/2.0', 'f/2.8', 'f/4.0', 'f/5.6', 'f/8.0', 'f/11', 'f/16', 'f/22', 'f/32', 'f/45', 'f/64'];
-    let lights = [];
-    let lightIdCounter = 0;
+    <div class="modal-overlay" id="modalConteudo" onclick="fecharModal(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="fecharModalBtn()">&times;</button>
+            <div class="modal-header">
+                <div id="modalData" style="font-size: 0.9em; color: #aaa; text-transform: uppercase;">Data</div>
+                <div id="modalUC" style="font-size: 1.2em; font-weight: bold; color: #fff;">UC e Aula</div>
+                <div id="modalProf" style="color: var(--accent-eventos); font-weight: bold;">Professor</div>
+            </div>
+            <div id="modalTexto" style="line-height: 1.6; white-space: pre-wrap;">
+                Conteúdo carregando...
+            </div>
+        </div>
+    </div>
 
-    window.onload = () => {
-        addLight('Principal', 8, 6); // Exemplo f/16 6/10
-        addLight('Preenchimento', 5, 5); // Exemplo f/5.6 5/10
-    };
+    <div id="view-calc" class="view page-container hidden">
+        <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
+        
+        <h1 class="page-title" style="border-bottom-color: var(--accent-calc);">Mapa de Luz</h1>
+        
+        <button class="btn-add-luz" onclick="addLight()">+ Adicionar Ponto de Luz (Máx 5)</button>
+        <div id="lightsContainer"></div>
+    </div>
 
-    function toggleTheme() {
-        const body = document.body;
-        const btn = document.getElementById('themeToggle');
-        if (body.getAttribute('data-theme') === 'dark') {
-            body.removeAttribute('data-theme');
-            btn.innerText = 'Ativar Modo Escuro';
-        } else {
-            body.setAttribute('data-theme', 'dark');
-            btn.innerText = 'Ativar Modo Claro';
-        }
-    }
+    <div id="view-eventos" class="view page-container hidden">
+        <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
+        
+        <h1 class="page-title" style="border-bottom-color: var(--accent-eventos);">Eventos e Prazos</h1>
 
-    function getAbsoluteValue(stopIndex, tenths) {
-        return (stopIndex * 10) + tenths;
-    }
+        <div id="lista-eventos">
+            </div>
+    </div>
 
-    function addLight(role = 'Preenchimento', baseStop = 6, tenths = 0) {
-        if (lights.length >= 5) return alert("Máximo de 5 luzes.");
-        const id = lightIdCounter++;
-        lights.push({ id, role, baseStop, tenths });
-        renderLights();
-    }
 
-    function removeLight(id) {
-        lights = lights.filter(l => l.id !== id);
-        renderLights();
-    }
-
-    function updateLight(id, field, value) {
-        const light = lights.find(l => l.id === id);
-        if (light) {
-            light[field] = value;
-            if (field === 'role' && value === 'Principal') {
-                lights.forEach(l => { if (l.id !== id && l.role === 'Principal') l.role = 'Preenchimento'; });
+    <script>
+        /* --- NAVEGAÇÃO E SPLASH SCREEN --- */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verifica se a splash já foi mostrada na sessão atual
+            if (!sessionStorage.getItem('splashShown')) {
+                document.getElementById('splash-screen').classList.remove('hidden');
+            } else {
+                dismissSplash();
             }
-            renderLights();
-        }
-    }
-
-    function nudgeLight(id, tenthsToAdd) {
-        const light = lights.find(l => l.id === id);
-        if (!light) return;
-        let newAbs = getAbsoluteValue(light.baseStop, light.tenths) + tenthsToAdd;
-        if (newAbs < 0) newAbs = 0;
-        if (newAbs > 120) newAbs = 120;
-        light.baseStop = Math.floor(newAbs / 10);
-        light.tenths = newAbs % 10;
-        renderLights();
-    }
-
-    function renderLights() {
-        const container = document.getElementById('lightsContainer');
-        container.innerHTML = '';
-        const principal = lights.find(l => l.role === 'Principal');
-
-        lights.forEach(light => {
-            const isPrincipal = light.role === 'Principal';
-            const row = document.createElement('div');
-            row.className = `light-row ${isPrincipal ? 'principal' : ''}`;
-
-            row.innerHTML = `
-                <select onchange="updateLight(${light.id}, 'role', this.value)">
-                    <option ${light.role==='Principal'?'selected':''}>Principal</option>
-                    <option ${light.role==='Preenchimento'?'selected':''}>Preenchimento</option>
-                    <option ${light.role==='Recorte'?'selected':''}>Recorte</option>
-                    <option ${light.role==='Fundo'?'selected':''}>Fundo</option>
-                </select>
-                <select onchange="updateLight(${light.id}, 'baseStop', parseInt(this.value))">
-                    ${fStopsFull.map((f, i) => `<option value="${i}" ${light.baseStop===i?'selected':''}>${f}</option>`).join('')}
-                </select>
-                <select onchange="updateLight(${light.id}, 'tenths', parseInt(this.value))">
-                    ${[0,1,2,3,4,5,6,7,8,9].map(t => `<option value="${t}" ${light.tenths===t?'selected':''}>${t}/10</option>`).join('')}
-                </select>
-                <div class="nudge-btns">
-                    <button onclick="nudgeLight(${light.id}, -5)">-1/2</button>
-                    <button onclick="nudgeLight(${light.id}, -1)">-1/10</button>
-                    <button onclick="nudgeLight(${light.id}, 1)">+1/10</button>
-                    <button onclick="nudgeLight(${light.id}, 5)">+1/2</button>
-                </div>
-                <button style="color:red; border:none; background:none; cursor:pointer;" onclick="removeLight(${light.id})">✖</button>
-                <div class="result-text" id="res-${light.id}"></div>
-            `;
-            container.appendChild(row);
-
-            const resDiv = document.getElementById(`res-${light.id}`);
-            if (isPrincipal) {
-                resDiv.innerText = "Luz de Referência";
-            } else if (principal) {
-                const diff = getAbsoluteValue(principal.baseStop, principal.tenths) - getAbsoluteValue(light.baseStop, light.tenths);
-                if (diff === 0) resDiv.innerText = "✅ Luz igualada.";
-                else {
-                    const dir = diff > 0 ? "Aumente" : "Reduza";
-                    const h = Math.floor(Math.abs(diff) / 5);
-                    const t = Math.abs(diff) % 5;
-                    resDiv.innerHTML = `⚙️ ${dir}: <strong>${h} clicks (1/2)</strong> e <strong>${t} clicks (1/10)</strong>.`;
-                }
+            
+            // Inicializa ferramentas
+            initAulas();
+            initEventos();
+            if(lights.length === 0) {
+                addLight('Principal', 8, 6); 
+                addLight('Preenchimento', 5, 5);
             }
         });
-    }
-</script>
+
+        function dismissSplash() {
+            sessionStorage.setItem('splashShown', 'true');
+            document.getElementById('splash-screen').classList.add('hidden');
+            document.getElementById('view-menu').classList.remove('hidden');
+        }
+
+        function switchView(viewId) {
+            // Oculta todas as views
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            // Mostra a selecionada
+            document.getElementById(viewId).classList.remove('hidden');
+            
+            // Controle especial pro rodapé de semanas nas Aulas
+            const rodapeAulas = document.getElementById('rodape-semanas');
+            if(rodapeAulas) {
+                if(viewId === 'view-aulas' && document.getElementById('filtroUC').value === "") {
+                    rodapeAulas.style.display = 'flex';
+                } else {
+                    rodapeAulas.style.display = 'none';
+                }
+            }
+            window.scrollTo(0,0);
+        }
+
+        /* --- MÓDULO: EVENTOS DA TURMA --- */
+        const baseEventos = [
+            { data: "2026-03-20", titulo: "Entrega de Portfólio (Draft 1)", desc: "Envio do primeiro esboço do portfólio para avaliação dos professores." },
+            { data: "2026-04-10", titulo: "Passeio Fotográfico: Centro Histórico", desc: "Saída fotográfica focada em arquitetura e street photography. Ponto de encontro: Estação da Luz." },
+            { data: "2026-04-29", titulo: "Exposição PI 41M", desc: "Visita e análise da exposição da turma 41M." },
+            { data: "2026-07-02", titulo: "GRANDE EVENTO: EXPOSIÇÃO PI 43M", desc: "Apresentação final do Projeto Integrador da nossa turma. Divulgação aberta." }
+        ];
+
+        function initEventos() {
+            const container = document.getElementById('lista-eventos');
+            let html = '';
+            
+            // Ordenar por data
+            baseEventos.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            baseEventos.forEach(ev => {
+                const [ano, mes, dia] = ev.data.split('-');
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+                html += `
+                    <div class="evento-card">
+                        <div class="evento-data">📅 ${dataFormatada}</div>
+                        <div class="evento-titulo">${ev.titulo}</div>
+                        <div class="evento-desc">${ev.desc}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        /* --- MÓDULO: CALCULADORA DE ESTÚDIO --- */
+        const fStopsFull = ['f/1.0', 'f/1.4', 'f/2.0', 'f/2.8', 'f/4.0', 'f/5.6', 'f/8.0', 'f/11', 'f/16', 'f/22', 'f/32', 'f/45', 'f/64'];
+        let lights = [];
+        let lightIdCounter = 0;
+
+        function getAbsoluteValue(stopIndex, tenths) { return (stopIndex * 10) + tenths; }
+
+        function addLight(role = 'Preenchimento', baseStop = 6, tenths = 0) {
+            if (lights.length >= 5) return alert("Máximo de 5 luzes.");
+            const id = lightIdCounter++;
+            lights.push({ id, role, baseStop, tenths });
+            renderLights();
+        }
+
+        function removeLight(id) {
+            lights = lights.filter(l => l.id !== id);
+            renderLights();
+        }
+
+        function updateLight(id, field, value) {
+            const light = lights.find(l => l.id === id);
+            if (light) {
+                light[field] = value;
+                if (field === 'role' && value === 'Principal') {
+                    lights.forEach(l => { if (l.id !== id && l.role === 'Principal') l.role = 'Preenchimento'; });
+                }
+                renderLights();
+            }
+        }
+
+        function nudgeLight(id, tenthsToAdd) {
+            const light = lights.find(l => l.id === id);
+            if (!light) return;
+            let newAbs = getAbsoluteValue(light.baseStop, light.tenths) + tenthsToAdd;
+            if (newAbs < 0) newAbs = 0;
+            if (newAbs > 120) newAbs = 120;
+            light.baseStop = Math.floor(newAbs / 10);
+            light.tenths = newAbs % 10;
+            renderLights();
+        }
+
+        function renderLights() {
+            const container = document.getElementById('lightsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            const principal = lights.find(l => l.role === 'Principal');
+
+            lights.forEach(light => {
+                const isPrincipal = light.role === 'Principal';
+                const row = document.createElement('div');
+                row.className = `light-row ${isPrincipal ? 'principal' : ''}`;
+
+                row.innerHTML = `
+                    <select onchange="updateLight(${light.id}, 'role', this.value)">
+                        <option ${light.role==='Principal'?'selected':''}>Principal</option>
+                        <option ${light.role==='Preenchimento'?'selected':''}>Preenchimento</option>
+                        <option ${light.role==='Recorte'?'selected':''}>Recorte</option>
+                        <option ${light.role==='Fundo'?'selected':''}>Fundo</option>
+                        <option ${light.role==='Cabelo'?'selected':''}>Cabelo</option>
+                    </select>
+                    <select onchange="updateLight(${light.id}, 'baseStop', parseInt(this.value))">
+                        ${fStopsFull.map((f, i) => `<option value="${i}" ${light.baseStop===i?'selected':''}>${f}</option>`).join('')}
+                    </select>
+                    <select onchange="updateLight(${light.id}, 'tenths', parseInt(this.value))">
+                        ${[0,1,2,3,4,5,6,7,8,9].map(t => `<option value="${t}" ${light.tenths===t?'selected':''}>${t}/10</option>`).join('')}
+                    </select>
+                    <div class="nudge-btns">
+                        <button onclick="nudgeLight(${light.id}, -5)">-1/2</button>
+                        <button onclick="nudgeLight(${light.id}, -1)">-1/10</button>
+                        <button onclick="nudgeLight(${light.id}, 1)">+1/10</button>
+                        <button onclick="nudgeLight(${light.id}, 5)">+1/2</button>
+                    </div>
+                    <button style="color:red; border:none; background:none; cursor:pointer; font-size:1.2rem; font-weight:bold;" onclick="removeLight(${light.id})">✖</button>
+                    <div class="result-text" id="res-${light.id}"></div>
+                `;
+                container.appendChild(row);
+
+                const resDiv = document.getElementById(`res-${light.id}`);
+                if (isPrincipal) {
+                    resDiv.innerText = "Luz de Referência (Âncora)";
+                    resDiv.style.color = "#28a745";
+                } else if (principal) {
+                    const diff = getAbsoluteValue(principal.baseStop, principal.tenths) - getAbsoluteValue(light.baseStop, light.tenths);
+                    if (diff === 0) {
+                        resDiv.innerText = "✅ Luz igualada.";
+                    } else {
+                        const dir = diff > 0 ? "Aumente" : "Reduza";
+                        const h = Math.floor(Math.abs(diff) / 5);
+                        const t = Math.abs(diff) % 5;
+                        resDiv.innerHTML = `⚙️ Na Tocha: <strong>${dir}</strong> luz em <strong>${h} clicks (1/2)</strong> e <strong>${t} clicks (1/10)</strong>.`;
+                    }
+                }
+            });
+        }
+
+        /* --- MÓDULO: PAINEL DE AULAS --- */
+        const nomesUC = {
+            "UC1": "Captar imagens", "UC2": "Iluminar cenas", "UC3": "Revelação digital", "UC4": "Manipular imagens",
+            "UC5": "Finalizar imagens", "UC6": "Captar vídeos", "UC7": "Fotojornalismo", "UC8": "Social", 
+            "UC9": "Moda e Editoriais", "UC10": "Propaganda e Publi", "UC11": "Paisagem e Arq", 
+            "UC12": "Ensaios fotográficos", "UC13": "Portfólio", "UC14": "Projeto Integrador"
+        };
+
+        const conteudosPrevistos = {
+            "2026-01-27": "Introdução a Portfólio e plataformas de criação de site.",
+            "2026-02-03": "Contrato e direitos autorais.",
+            "2026-02-10": "Empreendedorismo.",
+            "2026-02-11": "Coberta do espetáculo \"Heliogabalo\".",
+            "2026-02-12": "Edição das fotos do acervo e início de montagem do site.",
+            "2026-02-24": "Empreendedorismo.",
+            "2026-03-26": "Montagem de portfólio.",
+            "2026-04-29": "EXPOSIÇÃO PI 41M.",
+            "2026-04-30": "Portfólio e acompanhamento PI 43M.",
+            "2026-05-18": "Portfólio e acompanhamento PI 43M.",
+            "2026-07-01": "Portfólio - Apresentação.",
+            "2026-07-02": "EXPOSIÇÃO PI 43M."
+        };
+
+        // Mantive um sample menor das aulas brutas para o exemplo ficar mais limpo,
+        // Cole sua array completa de `rawAulas` aqui se ela for gigantesca.
+        const rawAulas = [
+            "2025-04-14|UC4|Marcella Camillo|1", "2025-04-15|UC1|Paula Lira|1", "2025-04-16|UC1|Paula Lira|2",
+            "2025-04-17|UC3|Guilherme Correia|1", "2025-04-22|UC1|Paula Lira|3", "2025-04-23|UC1|Paula Lira|4",
+            "2025-04-24|UC3|Guilherme Correia|2", "2025-04-28|UC2|Giovani Pagliusi|1", "2025-04-29|UC1|Paula Lira|5",
+            "2025-04-30|UC1|Paula Lira|6", "2025-05-06|UC14|Paula Lira|1", "2025-05-07|UC1|Paula Lira|7",
+            "2025-05-08|UC3|Guilherme Correia|3", "2025-05-12|UC1|Marcella Camillo|8", "2025-05-13|UC1|Paula Lira|9",
+            "2025-05-14|UC1|Paula Lira|10", "2025-05-15|UC1|Marcella Camillo|11", "2025-05-19|UC3|Flavia Guedes|4",
+            "2025-05-20|UC1|Paula Lira|12", "2025-05-21|UC14|Paula Lira|2", "2025-05-22|UC1|Marcella Camillo|13",
+            "2025-05-26|UC3|Flavia Guedes|5", "2025-05-27|UC3|Flavia Guedes|6", "2025-05-28|UC1|Paula Lira|14",
+            "2025-05-29|UC8|Marcella Camillo|1", "2025-06-02|UC1|Paula Lira|15", "2025-06-03|UC3|Guilherme Correia|7",
+            "2025-06-04|UC7|Paula Lira|1", "2025-06-05|UC7|Paula Lira|2", "2025-06-09|UC3|Flavia Guedes|8",
+            "2025-06-10|UC2|Marcella Camillo|2", "2025-06-11|UC7|Paula Lira|3", "2025-06-12|UC7|Paula Lira|4",
+            "2025-06-16|UC3|Flavia Guedes|9", "2025-06-17|UC8|Marcella Camillo|2", "2025-06-18|UC7|Paula Lira|5",
+            "2025-06-23|UC8|Marcella Camillo|3", "2025-06-24|UC2|Marcella Camillo|3", "2025-06-25|UC7|Paula Lira|6",
+            "2025-06-26|UC14|Guilherme Correia|3", "2025-06-30|UC8|Marcella Camillo|4", "2025-07-01|UC2|Marcella Camillo|4",
+            "2025-07-02|UC7|Paula Lira|7", "2025-07-03|UC7|Paula Lira|8", "2025-07-07|UC8|Marcella Camillo|5",
+            "2025-07-08|UC2|Marcella Camillo|5", "2025-07-28|UC5|Flavia Guedes|1", "2025-07-29|UC2|Marcella Camillo|6",
+            "2025-07-30|UC8|Marcella Camillo|6", "2025-07-31|UC8|Guilherme Correia|7", "2025-08-04|UC4|Flavia Guedes|2",
+            "2025-08-05|UC2|Marcella Camillo|7", "2025-08-07|UC4|Guilherme Correia|3", "2025-08-11|UC4|Flavia Guedes|4",
+            "2025-08-12|UC8|Giovani Pagliusi|8", "2025-08-13|UC2|Marcella Camillo|8", "2025-08-14|UC8|Guilherme Correia|9",
+            "2025-08-18|UC4|Flavia Guedes|5", "2025-08-19|UC2|Marcella Camillo|9", "2025-08-20|UC8|Marcella Camillo|10",
+            "2025-08-21|UC4|Guilherme Correia|6", "2025-08-25|UC8|Marcella Camillo|11", "2025-08-26|UC14|Marcella Camillo|4",
+            "2025-08-27|UC8|Marcella Camillo|12", "2025-08-28|UC8|Marcella Camillo|13", "2025-09-01|UC8|Marcella Camillo|14",
+            "2025-09-02|UC2|Marcella Camillo|10", "2025-09-03|UC7|Paula Lira|9", "2025-09-04|UC8|Jota Santos|15",
+            "2025-09-08|UC8|Marcella Camillo|16", "2025-09-10|UC7|Paula Lira|10", "2025-09-11|UC2|Marcella Camillo|11",
+            "2025-09-15|UC2|Marcella Camillo|12", "2025-09-16|UC6|Guilherme Correia|1", "2025-09-17|UC8|Marcella Camillo|17",
+            "2025-09-18|UC7|Paula Lira|11", "2025-09-22|UC7|Marcella Camillo|12", "2025-09-23|UC9|Marcella Camillo|1",
+            "2025-09-24|UC9|Marcella Camillo|2", "2025-09-29|UC9|Marcella Camillo|3", "2025-09-30|UC6|Guilherme Correia|2",
+            "2025-10-01|UC8|Jota Santos|18", "2025-10-02|UC7|Paula Lira|13", "2025-10-06|UC9|Marcella Camillo|4",
+            "2025-10-07|UC4|Flavia Guedes|7", "2025-10-08|UC7|Jota Santos|14", "2025-10-09|UC7|Paula Lira|15",
+            "2025-10-13|UC9|Marcella Camillo|5", "2025-10-14|UC5|Flavia Guedes|2", "2025-10-15|UC7|Jota Santos|16",
+            "2025-10-16|UC7|Paula Lira|17", "2025-10-20|UC6|Guilherme Correia|3", "2025-10-22|UC7|Marcella Camillo|18",
+            "2025-10-23|UC14|Paula Lira|5", "2025-10-27|UC9|Marcella Camillo|6", "2025-10-28|UC5|Flavia Guedes|3",
+            "2025-10-29|UC12|Marcella Camillo|1", "2025-10-30|UC6|Guilherme Correia|4", "2025-11-03|UC12|Marcella Camillo|2",
+            "2025-11-04|UC4|Flavia Guedes|8", "2025-11-05|UC6|Guilherme Correia|5", "2025-11-06|UC12|Jota Santos|3",
+            "2025-11-10|UC12|Marcella Camillo|4", "2025-11-11|UC12|Marcella Camillo|5", "2025-11-12|UC12|Marcella Camillo|6",
+            "2025-11-13|UC12|Marcella Camillo|7", "2025-11-18|UC4|Flavia Guedes|9", "2025-11-19|UC12|Jota Santos|8",
+            "2025-11-24|UC6|Guilherme Correia|6", "2025-11-25|UC4|Flavia Guedes|10", "2025-11-26|UC12|Marcella Camillo|9",
+            "2025-11-27|UC6|Guilherme Correia|7", "2025-12-01|UC6|Guilherme Correia|8", "2025-12-02|UC12|Marcella Camillo|10",
+            "2025-12-03|UC12|Marcella Camillo|11", "2026-01-26|UC12|Marcella Camillo|12", "2026-01-27|UC13|Marcella Camillo|1",
+            "2026-01-28|UC5|Guilherme Correia|4", "2026-01-29|UC5|Guilherme Correia|5", "2026-02-02|UC5|Guilherme Correia|6",
+            "2026-02-03|UC13|Barbara Milano|2", "2026-02-04|UC5|Jota Santos|7", "2026-02-05|UC5|Guilherme Correia|8",
+            "2026-02-09|UC6|Guilherme Correia|9", "2026-02-10|UC13|Barbara Milano|3", "2026-02-11|UC13|Marcella Camillo|4",
+            "2026-02-12|UC13|Marcella Camillo|5", "2026-02-19|UC11|Paula Lira|1", "2026-02-23|UC10|Guilherme Correia|1",
+            "2026-02-24|UC13|Barbara Milano|6", "2026-02-25|UC10|Guilherme Correia|2", "2026-02-26|UC11|Paula Lira|2",
+            "2026-03-02|UC10|Guilherme Correia|3", "2026-03-03|UC14|Flavia Guedes|6", "2026-03-04|UC10|Guilherme Correia|4",
+            "2026-03-05|UC10|Jota Santos|5", "2026-03-09|UC10|Guilherme Correia|6", "2026-03-10|UC4|Flavia Guedes|11",
+            "2026-03-11|UC10|Guilherme Correia|7", "2026-03-12|UC5|Jota Santos|9", "2026-03-16|UC11|Paula Lira|3",
+            "2026-03-17|UC4|Flavia Guedes|12", "2026-03-18|UC9|Jota Santos|7", "2026-03-19|UC11|Paula Lira|4",
+            "2026-03-23|UC10|Guilherme Correia|8", "2026-03-24|UC4|Flavia Guedes|13", "2026-03-25|UC9|Jota Santos|8",
+            "2026-03-26|UC13|Marcella Camillo|7", "2026-03-30|UC11|Paula Lira|5", "2026-03-31|UC11|Paula Lira|6",
+            "2026-04-01|UC9|Jota Santos|9", "2026-04-02|UC5|Jota Santos|10", "2026-04-06|UC10|Guilherme Correia|9",
+            "2026-04-07|UC4|Flavia Guedes|14", "2026-04-08|UC10|Guilherme Correia|10", "2026-04-09|UC10|Guilherme Correia|11",
+            "2026-04-13|UC11|Guilherme Correia|7", "2026-04-14|UC11|Paula Lira|8", "2026-04-15|UC11|Paula Lira|9",
+            "2026-04-16|UC11|Paula Lira|10", "2026-04-22|UC10|Guilherme Correia|12", "2026-04-23|UC9|Jota Santos|10",
+            "2026-04-27|UC4|Flavia Guedes|15", "2026-04-28|UC11|Paula Lira|11", "2026-04-29|UC14|Marcella Camillo|7",
+            "2026-04-30|UC13|Marcella Camillo|8", "2026-05-04|UC4|Guilherme Correia|16", "2026-05-05|UC11|Paula Lira|12",
+            "2026-05-06|UC11|Guilherme Correia|13", "2026-05-07|UC9|Jota Santos|11", "2026-05-11|UC11|Paula Lira|14",
+            "2026-05-12|UC4|Guilherme Correia|17", "2026-05-13|UC10|Guilherme Correia|13", "2026-05-14|UC9|Jota Santos|12",
+            "2026-05-18|UC13|Marcella Camillo|9", "2026-05-19|UC4|Guilherme Correia|18", "2026-05-20|UC11|Guilherme Correia|15",
+            "2026-05-21|UC9|Jota Santos|13", "2026-05-25|UC4|Guilherme Correia|19", "2026-05-26|UC10|Guilherme Correia|14",
+            "2026-05-27|UC9|Jota Santos|14", "2026-05-28|UC11|Guilherme Correia|16", "2026-06-01|UC5|Marcella Camillo|11",
+            "2026-06-02|UC4|Guilherme Correia|20", "2026-06-03|UC10|Guilherme Correia|15", "2026-06-08|UC11|Guilherme Correia|17",
+            "2026-06-09|UC4|Flavia Guedes|21", "2026-06-10|UC5|Guilherme Correia|12", "2026-06-11|UC9|Jota Santos|15",
+            "2026-06-15|UC11|Guilherme Correia|18", "2026-06-16|UC5|Flavia Guedes|13", "2026-06-17|UC10|Guilherme Correia|16",
+            "2026-06-18|UC9|Jota Santos|16", "2026-06-22|UC5|Flavia Guedes|14", "2026-06-23|UC5|Flavia Guedes|15",
+            "2026-06-24|UC9|Jota Santos|17", "2026-06-25|UC9|Jota Santos|18", "2026-06-30|UC10|Guilherme Correia|17",
+            "2026-07-01|UC13|Marcella Camillo|10", "2026-07-02|UC14|Jota Santos|8"
+        ];
+
+        const aulasArray = rawAulas.map(linha => {
+            const [data, uc, docente, aula] = linha.split('|');
+            return { data, codigoUC: uc, uc: `${uc} - ${nomesUC[uc] || ''}`, docente, aula };
+        });
+
+        function toISODate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+        function formatarDataBR(iso) {
+            const [a, m, d] = iso.split('-'); return `${d}/${m}/${a}`;
+        }
+        function getDiaDaSemana(iso) {
+            const d = new Date(iso.split('-')[0], iso.split('-')[1] - 1, iso.split('-')[2], 12, 0, 0);
+            return ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][d.getDay()];
+        }
+
+        function abrirModal(dataISO, ucNome, profNome, numAula) {
+            document.getElementById('modalData').innerText = `${getDiaDaSemana(dataISO)}, ${formatarDataBR(dataISO)}`;
+            document.getElementById('modalUC').innerText = `${ucNome} - Aula ${numAula}`;
+            document.getElementById('modalProf').innerText = `Prof. ${profNome}`;
+            document.getElementById('modalTexto').innerText = conteudosPrevistos[dataISO] || "Conteúdo não cadastrado.";
+            document.getElementById('modalConteudo').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function fecharModal(e) { if (e.target.id === 'modalConteudo') fecharModalBtn(); }
+        function fecharModalBtn() { document.getElementById('modalConteudo').style.display = 'none'; document.body.style.overflow = 'auto'; }
+
+        function initAulas() {
+            const select = document.getElementById('filtroUC');
+            for (const [codigo, nome] of Object.entries(nomesUC)) {
+                const opt = document.createElement('option');
+                opt.value = codigo; opt.textContent = `${codigo} - ${nome}`;
+                select.appendChild(opt);
+            }
+            mudarSemana(0);
+        }
+
+        document.getElementById('filtroUC').addEventListener('change', function(e) {
+            const ucSelec = e.target.value;
+            if (!ucSelec) return window.limparBusca();
+            
+            document.getElementById('painel-aulas').style.display = 'none';
+            document.getElementById('rodape-semanas').style.display = 'none';
+            const resPanel = document.getElementById('resultado-pesquisa');
+            resPanel.style.display = 'flex';
+
+            const dUC = aulasArray.filter(a => a.codigoUC === ucSelec);
+            let h = `<div class="card" style="border-left-color: #ff9800;">
+                        <button onclick="limparBusca()" class="btn-voltar" style="border-color: #ff9800; color:#ff9800;">⬅ Limpar Busca</button>
+                        <h3 style="margin-top:0; color:#ff9800;">${nomesUC[ucSelec]}</h3>`;
+            
+            if(dUC.length === 0) h += `<p>Sem aulas agendadas.</p>`;
+            dUC.forEach(a => {
+                h += `<div style="padding:10px 0; border-bottom:1px solid #333;" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
+                        <strong>${formatarDataBR(a.data)}</strong> - Prof. ${a.docente} (Aula ${a.aula})
+                      </div>`;
+            });
+            resPanel.innerHTML = h + `</div>`;
+        });
+
+        window.limparBusca = function() {
+            document.getElementById('filtroUC').value = "";
+            document.getElementById('resultado-pesquisa').style.display = 'none';
+            document.getElementById('painel-aulas').style.display = 'flex';
+            document.getElementById('rodape-semanas').style.display = 'flex';
+        }
+
+        function mudarSemana(offset) {
+            document.getElementById('btn-passada').classList.toggle('active', offset === -1);
+            document.getElementById('btn-atual').classList.toggle('active', offset === 0);
+            document.getElementById('btn-que-vem').classList.toggle('active', offset === 1);
+            
+            const hoje = new Date();
+            const seg = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - hoje.getDay() + 1 + (offset * 7), 12, 0, 0);
+            const sex = new Date(seg.getFullYear(), seg.getMonth(), seg.getDate() + 4, 12, 0, 0);
+            
+            const aSemana = aulasArray.filter(a => a.data >= toISODate(seg) && a.data <= toISODate(sex));
+            
+            let html = `<h3 style="text-align:center;">Sua Semana</h3>`;
+            if (aSemana.length === 0) html += `<div class="card"><div class="details">Sem aulas programadas.</div></div>`;
+            
+            aSemana.forEach(a => {
+                const isHoje = a.data === toISODate(hoje) ? 'today' : (a.data < toISODate(hoje) ? 'past' : 'next');
+                html += `
+                <div class="card ${isHoje}" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
+                    <div class="status">${isHoje === 'today' ? '🔥 HOJE' : getDiaDaSemana(a.data)}</div>
+                    <div class="date">${formatarDataBR(a.data)}</div>
+                    <div class="details"><span style="color:#fff;font-weight:bold;">${a.uc}</span><br>Prof: ${a.docente}</div>
+                </div>`;
+            });
+            document.getElementById('painel-aulas').innerHTML = html;
+        }
+    </script>
 </body>
 </html>
