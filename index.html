@@ -13,10 +13,11 @@
             --bg-panel: #1e1e1e;
             --text-main: #e0e0e0;
             --text-muted: #aaaaaa;
-            --accent-senac: #f26e22; /* Laranja Senac aproximado */
+            --accent-senac: #f47920; /* Laranja Oficial Senac */
             --accent-calc: #0056b3;
             --accent-aulas: #4caf50;
             --accent-eventos: #9c27b0;
+            --accent-warning: #ff9800; /* Laranja de aviso */
             --border-color: #333;
         }
 
@@ -29,7 +30,6 @@
             overflow-x: hidden;
         }
 
-        /* Oculta elementos na interface */
         .hidden { display: none !important; }
 
         /* Botão genérico de voltar */
@@ -49,14 +49,13 @@
         }
         .btn-voltar:hover { background-color: #2a2a2a; }
 
-        /* Contêiner das páginas */
         .page-container {
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
             min-height: 100vh;
             box-sizing: border-box;
-            padding-bottom: 80px; /* Espaço pro footer */
+            padding-bottom: 80px;
         }
 
         h1.page-title {
@@ -69,9 +68,32 @@
             padding-bottom: 10px;
         }
 
+        /* Disclaimer de Responsabilidade */
+        .disclaimer-box {
+            background-color: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--accent-warning);
+            color: var(--text-main);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .disclaimer-box strong { color: var(--accent-warning); }
+
         /* ==========================================
-           2. TELA DE ABERTURA (SPLASH SCREEN)
+           2. TELA DE ABERTURA E CABEÇALHO DO MENU
            ========================================== */
+        .senac-logo-img {
+            max-width: 180px;
+            margin-bottom: 15px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -88,9 +110,7 @@
             animation: fadeIn 0.5s ease-in;
         }
         
-        .splash-logo svg { width: 120px; height: auto; margin-bottom: 20px; }
-        .splash-title { font-size: 2.5rem; font-weight: bold; margin: 0; letter-spacing: 2px; }
-        .splash-subtitle { font-size: 1.2rem; color: var(--accent-senac); margin: 5px 0 30px 0; }
+        .splash-subtitle { font-size: 1.2rem; color: var(--accent-senac); margin: 5px 0 30px 0; font-weight: bold; }
         .splash-curso { font-size: 1.1rem; color: var(--text-muted); margin: 2px 0; }
         .splash-turma { font-size: 1.4rem; font-weight: bold; color: #fff; margin: 10px 0; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 4px; display: inline-block;}
         .splash-footer { position: absolute; bottom: 20px; font-size: 0.8rem; color: #666; }
@@ -110,6 +130,26 @@
             min-height: 100vh;
             gap: 20px;
             padding: 20px;
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .menu-turma-badge {
+            font-size: 1.2rem;
+            color: #fff;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
         
         .menu-btn {
@@ -136,7 +176,7 @@
         .menu-btn.btn-eventos { border-left: 5px solid var(--accent-eventos); }
 
         /* ==========================================
-           4. PAINEL DE AULAS (Seus estilos originais)
+           4. PAINEL DE AULAS
            ========================================== */
         .search-box { background-color: var(--bg-panel); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--accent-senac); }
         .search-box label { display: block; margin-bottom: 8px; font-weight: bold; color: #ccc; }
@@ -146,8 +186,9 @@
         .card.past { border-left-color: #888; opacity: 0.7; }
         .card.today { border-left-color: #e91e63; background-color: #2a1b20; }
         .card.next { border-left-color: #2196f3; }
+        .card.cancelled { border-left-color: #f44336; opacity: 0.8; }
         .status { font-size: 0.85em; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; }
-        .past .status { color: #aaa; } .today .status { color: #ff4081; } .next .status { color: #64b5f6; }
+        .past .status { color: #aaa; } .today .status { color: #ff4081; } .next .status { color: #64b5f6; } .cancelled .status { color: #f44336; }
         .date { font-size: 1.2em; margin-bottom: 5px; color: #fff; }
         .details { font-size: 1em; color: #ccc; }
         .footer-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-panel); display: flex; justify-content: center; padding: 15px 10px; z-index: 100; box-sizing: border-box; box-shadow: 0 -4px 10px rgba(0,0,0,0.5); }
@@ -162,7 +203,7 @@
         .modal-header { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
 
         /* ==========================================
-           5. CALCULADORA DE F-STOP (Estilos integrados)
+           5. CALCULADORA DE F-STOP
            ========================================== */
         .btn-add-luz { background-color: var(--accent-calc); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; margin-bottom: 20px; font-size: 1rem; }
         .light-row { border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius: 6px; background-color: var(--bg-panel); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -173,7 +214,7 @@
         .result-text { width: 100%; margin-top: 10px; font-size: 0.95rem; font-weight: bold; }
 
         /* ==========================================
-           6. EVENTOS (Estilos Simples)
+           6. EVENTOS
            ========================================== */
         .evento-card { background-color: var(--bg-panel); border-left: 5px solid var(--accent-eventos); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .evento-data { color: var(--accent-eventos); font-weight: bold; font-size: 0.9em; margin-bottom: 5px; }
@@ -184,14 +225,8 @@
 <body>
 
     <div id="splash-screen" onclick="dismissSplash()">
-        <div class="splash-logo">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="10,90 50,10 90,90" fill="#f26e22" />
-                <polygon points="50,10 90,90 65,90" fill="#d05a18" />
-                <polygon points="50,10 50,90 10,90" fill="#ff8c42" />
-            </svg>
-        </div>
-        <h1 class="splash-title">SENAC</h1>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Senac_logo.svg" alt="Senac Logo" class="senac-logo-img">
+        
         <div class="splash-subtitle">Lapa - Scipião</div>
         
         <div class="splash-curso">Técnico em Processos Fotográficos</div>
@@ -201,12 +236,19 @@
         <div class="click-hint-splash">Toque em qualquer lugar para entrar</div>
 
         <div class="splash-footer">
-            Versão 3.0 | Desenvolvido por Harry Bour
+            Versão 3.2 | Desenvolvido por Harry Bour
         </div>
     </div>
 
     <div id="view-menu" class="view hidden">
         <div id="main-menu">
+            
+            <div class="menu-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Senac_logo.svg" alt="Senac Logo" class="senac-logo-img" style="margin-bottom: 5px;">
+                <br>
+                <div class="menu-turma-badge">Turma: SCI-TPF43M</div>
+            </div>
+
             <button class="menu-btn btn-aulas" onclick="switchView('view-aulas')">
                 <span class="menu-icon">📅</span> Crono de Aulas
             </button>
@@ -223,6 +265,10 @@
         <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
         
         <h1 class="page-title" style="border-bottom-color: var(--accent-aulas);">Crono de Aulas</h1>
+
+        <div class="disclaimer-box">
+            <strong>⚠️ Atenção:</strong> O Cronograma pode sofrer alterações não refletidas nessa ferramenta em tempo real. Essa ferramenta é um apoio, mas cabe ao aluno a responsabilidade individual de acompanhar o cronograma, disponível por meios oficiais da instituição de ensino.
+        </div>
 
         <div class="search-box">
             <label for="filtroUC">Pesquisar datas por UC:</label>
@@ -271,6 +317,10 @@
         
         <h1 class="page-title" style="border-bottom-color: var(--accent-eventos);">Eventos e Prazos</h1>
 
+        <div class="disclaimer-box">
+            <strong>⚠️ Atenção:</strong> O Cronograma pode sofrer alterações não refletidas nessa ferramenta em tempo real. Essa ferramenta é um apoio, mas cabe ao aluno a responsabilidade individual de acompanhar o cronograma, disponível por meios oficiais da instituição de ensino.
+        </div>
+
         <div id="lista-eventos">
             </div>
     </div>
@@ -279,14 +329,12 @@
     <script>
         /* --- NAVEGAÇÃO E SPLASH SCREEN --- */
         document.addEventListener('DOMContentLoaded', () => {
-            // Verifica se a splash já foi mostrada na sessão atual
             if (!sessionStorage.getItem('splashShown')) {
                 document.getElementById('splash-screen').classList.remove('hidden');
             } else {
                 dismissSplash();
             }
             
-            // Inicializa ferramentas
             initAulas();
             initEventos();
             if(lights.length === 0) {
@@ -302,12 +350,9 @@
         }
 
         function switchView(viewId) {
-            // Oculta todas as views
             document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-            // Mostra a selecionada
             document.getElementById(viewId).classList.remove('hidden');
             
-            // Controle especial pro rodapé de semanas nas Aulas
             const rodapeAulas = document.getElementById('rodape-semanas');
             if(rodapeAulas) {
                 if(viewId === 'view-aulas' && document.getElementById('filtroUC').value === "") {
@@ -331,7 +376,6 @@
             const container = document.getElementById('lista-eventos');
             let html = '';
             
-            // Ordenar por data
             baseEventos.sort((a, b) => new Date(a.data) - new Date(b.data));
 
             baseEventos.forEach(ev => {
@@ -458,6 +502,7 @@
             "2026-02-11": "Coberta do espetáculo \"Heliogabalo\".",
             "2026-02-12": "Edição das fotos do acervo e início de montagem do site.",
             "2026-02-24": "Empreendedorismo.",
+            "2026-03-03": "⚠️ Aula cancelada.",
             "2026-03-26": "Montagem de portfólio.",
             "2026-04-29": "EXPOSIÇÃO PI 41M.",
             "2026-04-30": "Portfólio e acompanhamento PI 43M.",
@@ -466,8 +511,7 @@
             "2026-07-02": "EXPOSIÇÃO PI 43M."
         };
 
-        // Mantive um sample menor das aulas brutas para o exemplo ficar mais limpo,
-        // Cole sua array completa de `rawAulas` aqui se ela for gigantesca.
+        // ARRAY COMPLETA COM ALTERAÇÃO NO DIA 03/03/2026
         const rawAulas = [
             "2025-04-14|UC4|Marcella Camillo|1", "2025-04-15|UC1|Paula Lira|1", "2025-04-16|UC1|Paula Lira|2",
             "2025-04-17|UC3|Guilherme Correia|1", "2025-04-22|UC1|Paula Lira|3", "2025-04-23|UC1|Paula Lira|4",
@@ -513,7 +557,7 @@
             "2026-02-09|UC6|Guilherme Correia|9", "2026-02-10|UC13|Barbara Milano|3", "2026-02-11|UC13|Marcella Camillo|4",
             "2026-02-12|UC13|Marcella Camillo|5", "2026-02-19|UC11|Paula Lira|1", "2026-02-23|UC10|Guilherme Correia|1",
             "2026-02-24|UC13|Barbara Milano|6", "2026-02-25|UC10|Guilherme Correia|2", "2026-02-26|UC11|Paula Lira|2",
-            "2026-03-02|UC10|Guilherme Correia|3", "2026-03-03|UC14|Flavia Guedes|6", "2026-03-04|UC10|Guilherme Correia|4",
+            "2026-03-02|UC10|Guilherme Correia|3", "2026-03-03|UC14|Flavia Guedes|6 (Cancelada)", "2026-03-04|UC10|Guilherme Correia|4",
             "2026-03-05|UC10|Jota Santos|5", "2026-03-09|UC10|Guilherme Correia|6", "2026-03-10|UC4|Flavia Guedes|11",
             "2026-03-11|UC10|Guilherme Correia|7", "2026-03-12|UC5|Jota Santos|9", "2026-03-16|UC11|Paula Lira|3",
             "2026-03-17|UC4|Flavia Guedes|12", "2026-03-18|UC9|Jota Santos|7", "2026-03-19|UC11|Paula Lira|4",
@@ -621,10 +665,22 @@
             if (aSemana.length === 0) html += `<div class="card"><div class="details">Sem aulas programadas.</div></div>`;
             
             aSemana.forEach(a => {
-                const isHoje = a.data === toISODate(hoje) ? 'today' : (a.data < toISODate(hoje) ? 'past' : 'next');
+                // Checa se a aula tem a tag de cancelada para estilizar em vermelho
+                const isCancelled = a.aula.includes('Cancelada');
+                let cardClass = '';
+                let statusMsg = '';
+
+                if (isCancelled) {
+                    cardClass = 'cancelled';
+                    statusMsg = `❌ CANCELADA - ${getDiaDaSemana(a.data)}`;
+                } else {
+                    cardClass = a.data === toISODate(hoje) ? 'today' : (a.data < toISODate(hoje) ? 'past' : 'next');
+                    statusMsg = cardClass === 'today' ? '🔥 HOJE' : getDiaDaSemana(a.data);
+                }
+
                 html += `
-                <div class="card ${isHoje}" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
-                    <div class="status">${isHoje === 'today' ? '🔥 HOJE' : getDiaDaSemana(a.data)}</div>
+                <div class="card ${cardClass}" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
+                    <div class="status">${statusMsg}</div>
                     <div class="date">${formatarDataBR(a.data)}</div>
                     <div class="details"><span style="color:#fff;font-weight:bold;">${a.uc}</span><br>Prof: ${a.docente}</div>
                 </div>`;
