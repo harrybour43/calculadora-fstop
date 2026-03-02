@@ -1,9 +1,28 @@
+=============================================================================
+PROJETO: Calculadora de F-Stop Multi-Luz
+DESENVOLVEDOR: Harry Bour (Turma SCI-TPF43M)
+OBJETIVO: Mapear a iluminação de estúdio traduzindo leituras do fotômetro de mão para estabelecer o nivelamento exato entre diferentes fontes de luz.
+FUNÇÕES:
+
+Gerenciamento de até 5 pontos de luz simultâneos (Principal, Preenchimento, Recorte, Fundo, Cabelo).
+
+Cálculo automático da diferença de exposição em relação à luz âncora (Principal).
+
+Indicação precisa de ajustes físicos na tocha (clicks de 1/2 e 1/10 de ponto).
+
+Controles virtuais de ajuste fino (+/-).
+
+Interface com Modo Claro e Modo Escuro.
+DATA E HORA: 02/03/2026 às 14:23 (BRT)
+VERSÃO: 2.0
+=============================================================================
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de F-Stop</title>
+    <title>Calculadora de F-Stop Multi-Luz</title>
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -12,12 +31,12 @@
             --border-color: #ccc;
             --btn-bg: #0056b3;
             --btn-hover: #004494;
+            --btn-secondary: #6c757d;
             --result-bg: #e9ecef;
             --action-bg: #fdf2f2;
-            --action-text: #c9302c;
-            --action-border: #d9534f;
             --input-bg: #fff;
             --input-text: #333;
+            --highlight: #28a745;
         }
 
         [data-theme="dark"] {
@@ -27,94 +46,111 @@
             --border-color: #444;
             --btn-bg: #375a7f;
             --btn-hover: #2b4764;
+            --btn-secondary: #495057;
             --result-bg: #2c2c2c;
             --action-bg: #4a1c1c;
-            --action-text: #ff8a8a;
-            --action-border: #ff5252;
             --input-bg: #333;
             --input-text: #e0e0e0;
+            --highlight: #218838;
         }
 
         body {
             font-family: Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
             transition: background-color 0.3s, color 0.3s;
+            margin: 0;
         }
         .container {
             background: var(--container-bg);
             padding: 20px 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 400px;
+            max-width: 800px;
             width: 100%;
-            transition: background-color 0.3s;
         }
-        h1 {
-            font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        select, button {
-            width: 100%;
-            padding: 10px;
+        h1 { text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
+        
+        .light-row {
+            border: 1px solid var(--border-color);
+            padding: 15px;
             margin-bottom: 15px;
+            border-radius: 6px;
+            background-color: var(--result-bg);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .light-row.principal {
+            border-color: var(--highlight);
+            border-left: 5px solid var(--highlight);
+        }
+
+        select, button {
+            padding: 8px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: 1rem;
             background-color: var(--input-bg);
             color: var(--input-text);
         }
-        button {
+
+        .nudge-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nudge-btns button {
+            background-color: var(--btn-secondary);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+        }
+
+        .nudge-btns button:hover { opacity: 0.9; }
+
+        .btn-primary {
             background-color: var(--btn-bg);
             color: white;
-            border: none;
             cursor: pointer;
+            width: 100%;
             font-weight: bold;
-            transition: background-color 0.3s;
+            padding: 12px;
+            margin-top: 10px;
         }
-        button:hover {
-            background-color: var(--btn-hover);
+        .btn-primary:hover { background-color: var(--btn-hover); }
+
+        .btn-add {
+            background-color: var(--highlight);
+            color: white;
+            cursor: pointer;
+            margin-bottom: 20px;
         }
+
         .theme-btn {
             background-color: transparent;
             color: var(--text-color);
-            border: 1px solid var(--border-color);
             margin-bottom: 20px;
+            width: 100%;
+            cursor: pointer;
         }
-        .theme-btn:hover {
-            background-color: var(--result-bg);
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: var(--result-bg);
-            border-left: 5px solid var(--btn-bg);
-            border-radius: 4px;
-            font-size: 1.1rem;
-            min-height: 50px;
-        }
-        .action-required {
-            border-left-color: var(--action-border);
-            background-color: var(--action-bg);
-            color: var(--action-text);
+
+        .result-text {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 0.95rem;
             font-weight: bold;
         }
+
         .footer-credits {
             margin-top: 25px;
             text-align: center;
             font-size: 0.85rem;
-            color: var(--text-color);
             opacity: 0.8;
             border-top: 1px solid var(--border-color);
             padding-top: 15px;
@@ -126,43 +162,12 @@
 <div class="container">
     <button id="themeToggle" class="theme-btn" onclick="toggleTheme()">Ativar Modo Escuro</button>
 
-    <h1>Calculadora de F-Stop</h1>
+    <h1>Estúdio: Mapa de Luz</h1>
     
-    <label for="baseStop">F-Stop Base (Fotômetro):</label>
-    <select id="baseStop">
-        <option value="0">f/1.0</option>
-        <option value="1">f/1.4</option>
-        <option value="2">f/2.0</option>
-        <option value="3">f/2.8</option>
-        <option value="4">f/4.0</option>
-        <option value="5">f/5.6</option>
-        <option selected value="6">f/8.0</option>
-        <option value="7">f/11</option>
-        <option value="8">f/16</option>
-        <option value="9">f/22</option>
-        <option value="10">f/32</option>
-        <option value="11">f/45</option>
-    </select>
+    <button class="btn-add" onclick="addLight()">+ Adicionar Ponto de Luz (Máx 5)</button>
 
-    <label for="tenths">Décimos de Ponto:</label>
-    <select id="tenths">
-        <option value="0">0/10</option>
-        <option value="1">1/10</option>
-        <option value="2">2/10</option>
-        <option value="3">3/10</option>
-        <option value="4">4/10</option>
-        <option value="5">5/10</option>
-        <option value="6">6/10</option>
-        <option value="7">7/10</option>
-        <option value="8">8/10</option>
-        <option value="9">9/10</option>
-    </select>
-
-    <button onclick="calculateFStop()">Calcular Abertura</button>
-
-    <div id="resultBox" class="result">
-        Aguardando cálculo...
-    </div>
+    <div id="lightsContainer">
+        </div>
 
     <div class="footer-credits">
         Desenvolvido por Harry Bour para turma SCI-TPF43M
@@ -170,10 +175,20 @@
 </div>
 
 <script>
+    const fStopsFull = ['f/1.0', 'f/1.4', 'f/2.0', 'f/2.8', 'f/4.0', 'f/5.6', 'f/8.0', 'f/11', 'f/16', 'f/22', 'f/32', 'f/45', 'f/64'];
+    let lights = [];
+    let lightIdCounter = 0;
+
+    // Inicializa com 3 luzes para exemplo
+    window.onload = () => {
+        addLight('Principal', 8, 6); // f/16 6/10
+        addLight('Preenchimento', 5, 5); // f/5.6 5/10
+        addLight('Recorte', 7, 3); // f/11 3/10
+    };
+
     function toggleTheme() {
         const body = document.body;
         const btn = document.getElementById('themeToggle');
-        
         if (body.getAttribute('data-theme') === 'dark') {
             body.removeAttribute('data-theme');
             btn.innerText = 'Ativar Modo Escuro';
@@ -183,67 +198,175 @@
         }
     }
 
-    const fStops = [
-        { f: '1.0', t1: '1.1', t2: '1.2', next: '1.4' },
-        { f: '1.4', t1: '1.6', t2: '1.8', next: '2.0' },
-        { f: '2.0', t1: '2.2', t2: '2.5', next: '2.8' },
-        { f: '2.8', t1: '3.2', t2: '3.5', next: '4.0' },
-        { f: '4.0', t1: '4.5', t2: '5.0', next: '5.6' },
-        { f: '5.6', t1: '6.3', t2: '7.1', next: '8.0' },
-        { f: '8.0', t1: '9.0', t2: '10', next: '11' },
-        { f: '11', t1: '13', t2: '14', next: '16' },
-        { f: '16', t1: '18', t2: '20', next: '22' },
-        { f: '22', t1: '25', t2: '29', next: '32' },
-        { f: '32', t1: '36', t2: '40', next: '45' },
-        { f: '45', t1: '51', t2: '57', next: '64' }
-    ];
+    function getAbsoluteValue(stopIndex, tenths) {
+        return (stopIndex * 10) + tenths;
+    }
 
-    function calculateFStop() {
-        const stopIndex = parseInt(document.getElementById('baseStop').value);
-        const tenths = parseInt(document.getElementById('tenths').value);
-        const resultBox = document.getElementById('resultBox');
+    function addLight(role = 'Preenchimento', baseStop = 6, tenths = 0) {
+        if (lights.length >= 5) return alert("Máximo de 5 luzes atingido.");
         
-        const stopData = fStops[stopIndex];
-        let message = "";
-        let isActionRequired = false;
+        const id = lightIdCounter++;
+        lights.push({ id, role, baseStop, tenths });
+        renderLights();
+    }
 
-        switch(tenths) {
-            case 0:
-            case 1:
-                message = `Use o ponto inteiro: <strong>f/${stopData.f}</strong>`;
-                break;
-            case 2:
-                message = `MEXE NA LUZ<br><br>Reduza a luz em 2/10 para usar <strong>f/${stopData.f}</strong> (Ponto inteiro menor) <br>OU<br>Aumente a luz em 1/10 para usar <strong>f/${stopData.t1}</strong> (Primeiro terço).`;
-                isActionRequired = true;
-                break;
-            case 3:
-            case 4:
-                message = `Use o primeiro terço: <strong>f/${stopData.t1}</strong>`;
-                break;
-            case 5:
-                message = `MEXE NA LUZ<br><br>Mude a luz 1/2 ponto para cima ou para baixo para usar um ponto inteiro (<strong>f/${stopData.f}</strong> ou <strong>f/${stopData.next}</strong>).`;
-                isActionRequired = true;
-                break;
-            case 6:
-            case 7:
-                message = `Use o segundo terço: <strong>f/${stopData.t2}</strong>`;
-                break;
-            case 8:
-                message = `MEXE NA LUZ<br><br>Reduza a luz em 1/10 para usar <strong>f/${stopData.t2}</strong> (Segundo terço) <br>OU<br>Aumente a luz em 2/10 para usar <strong>f/${stopData.next}</strong> (Ponto inteiro superior).`;
-                isActionRequired = true;
-                break;
-            case 9:
-                message = `Use o ponto inteiro superior: <strong>f/${stopData.next}</strong>`;
-                break;
+    function removeLight(id) {
+        lights = lights.filter(l => l.id !== id);
+        renderLights();
+    }
+
+    function updateLight(id, field, value) {
+        const light = lights.find(l => l.id === id);
+        if (light) {
+            light[field] = value;
+            
+            // Força que apenas uma luz seja Principal
+            if (field === 'role' && value === 'Principal') {
+                lights.forEach(l => { if (l.id !== id && l.role === 'Principal') l.role = 'Preenchimento'; });
+            }
+            renderLights();
         }
+    }
 
-        resultBox.innerHTML = message;
+    function nudgeLight(id, tenthsToAdd) {
+        const light = lights.find(l => l.id === id);
+        if (!light) return;
+
+        let currentAbs = getAbsoluteValue(light.baseStop, light.tenths);
+        let newAbs = currentAbs + tenthsToAdd;
         
-        if (isActionRequired) {
-            resultBox.classList.add('action-required');
-        } else {
-            resultBox.classList.remove('action-required');
-        }
+        // Limites (f/1.0 até f/64)
+        if (newAbs < 0) newAbs = 0;
+        if (newAbs > 120) newAbs = 120;
+
+        light.baseStop = Math.floor(newAbs / 10);
+        light.tenths = newAbs % 10;
+        renderLights();
+    }
+
+    function calculateInstructions() {
+        // Encontra a luz principal
+        const principal = lights.find(l => l.role === 'Principal');
+        
+        lights.forEach(light => {
+            const resultDiv = document.getElementById(`result-${light.id}`);
+            
+            if (light.role === 'Principal') {
+                resultDiv.innerHTML = "<em>Luz Âncora (Referência)</em>";
+                resultDiv.style.color = "var(--highlight)";
+                return;
+            }
+
+            if (!principal) {
+                resultDiv.innerHTML = "Defina uma luz como 'Principal' para calcular os ajustes.";
+                resultDiv.style.color = "var(--action-text)";
+                return;
+            }
+
+            const absPrincipal = getAbsoluteValue(principal.baseStop, principal.tenths);
+            const absCurrent = getAbsoluteValue(light.baseStop, light.tenths);
+            const diff = absPrincipal - absCurrent;
+
+            if (diff === 0) {
+                resultDiv.innerHTML = "✅ Igualada com a Principal.";
+                resultDiv.style.color = "var(--text-color)";
+                return;
+            }
+
+            const direction = diff > 0 ? "Aumente" : "Reduza";
+            const absDiff = Math.abs(diff);
+            
+            const halfClicks = Math.floor(absDiff / 5);
+            const tenthClicks = absDiff % 5;
+
+            let instruction = `⚙️ Na Tocha: <strong>${direction}</strong> a luz em `;
+            let parts = [];
+            if (halfClicks > 0) parts.push(`${halfClicks} click(s) de 1/2 ponto`);
+            if (tenthClicks > 0) parts.push(`${tenthClicks} click(s) de 1/10`);
+            
+            instruction += parts.join(" e ") + ".";
+
+            resultDiv.innerHTML = instruction;
+            resultDiv.style.color = "var(--text-color)";
+        });
+    }
+
+    function renderLights() {
+        const container = document.getElementById('lightsContainer');
+        container.innerHTML = '';
+
+        lights.forEach(light => {
+            const isPrincipal = light.role === 'Principal';
+            const row = document.createElement('div');
+            row.className = `light-row ${isPrincipal ? 'principal' : ''}`;
+
+            // Select Role
+            const roleSelect = document.createElement('select');
+            ['Principal', 'Preenchimento', 'Recorte', 'Fundo', 'Cabelo'].forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.text = opt;
+                if (light.role === opt) option.selected = true;
+                roleSelect.appendChild(option);
+            });
+            roleSelect.onchange = (e) => updateLight(light.id, 'role', e.target.value);
+
+            // Select Base F-Stop
+            const fStopSelect = document.createElement('select');
+            fStopsFull.forEach((f, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = f;
+                if (light.baseStop === index) option.selected = true;
+                fStopSelect.appendChild(option);
+            });
+            fStopSelect.onchange = (e) => updateLight(light.id, 'baseStop', parseInt(e.target.value));
+
+            // Select Tenths
+            const tenthsSelect = document.createElement('select');
+            for (let i = 0; i < 10; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.text = `${i}/10`;
+                if (light.tenths === i) option.selected = true;
+                tenthsSelect.appendChild(option);
+            }
+            tenthsSelect.onchange = (e) => updateLight(light.id, 'tenths', parseInt(e.target.value));
+
+            // Nudge Buttons (+/-)
+            const nudgeDiv = document.createElement('div');
+            nudgeDiv.className = 'nudge-btns';
+            nudgeDiv.innerHTML = `
+                <button onclick="nudgeLight(${light.id}, -5)" title="- 1/2 Ponto">-1/2</button>
+                <button onclick="nudgeLight(${light.id}, -1)" title="- 1/10 Ponto">-1/10</button>
+                <button onclick="nudgeLight(${light.id}, 1)" title="+ 1/10 Ponto">+1/10</button>
+                <button onclick="nudgeLight(${light.id}, 5)" title="+ 1/2 Ponto">+1/2</button>
+            `;
+
+            // Delete Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerText = 'X';
+            deleteBtn.style.backgroundColor = 'var(--action-bg)';
+            deleteBtn.style.color = 'var(--action-text)';
+            deleteBtn.onclick = () => removeLight(light.id);
+
+            // Result Text Container
+            const resultText = document.createElement('div');
+            resultText.id = `result-${light.id}`;
+            resultText.className = 'result-text';
+
+            // Append elements
+            row.appendChild(roleSelect);
+            row.appendChild(fStopSelect);
+            row.appendChild(tenthsSelect);
+            row.appendChild(nudgeDiv);
+            if (!isPrincipal || lights.length > 1) row.appendChild(deleteBtn);
+            row.appendChild(resultText);
+
+            container.appendChild(row);
+        });
+
+        calculateInstructions();
     }
 </script>
 
