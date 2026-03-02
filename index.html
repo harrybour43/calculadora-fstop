@@ -225,7 +225,7 @@
             Sincronizando banco de dados...
         </div>
         <div class="click-hint-splash hidden" id="click-hint">Toque em qualquer lugar para entrar</div>
-        <div class="splash-footer">Versão 4.0 | Desenvolvido por Harry Bour</div>
+        <div class="splash-footer">Versão 4.2 | Desenvolvido por Harry Bour</div>
     </div>
 
     <div id="view-menu" class="view hidden">
@@ -239,11 +239,11 @@
             <button class="menu-btn btn-aulas" onclick="switchView('view-aulas')">
                 <span class="menu-icon">📅</span> Crono de Aulas
             </button>
-            <button class="menu-btn btn-calc" onclick="switchView('view-calc')">
-                <span class="menu-icon">🧮</span> Calculadora
-            </button>
             <button class="menu-btn btn-eventos" onclick="switchView('view-eventos')">
                 <span class="menu-icon">📷</span> Eventos da Turma
+            </button>
+            <button class="menu-btn btn-calc" onclick="switchView('view-calc')">
+                <span class="menu-icon">🧮</span> Calculadora
             </button>
         </div>
     </div>
@@ -307,15 +307,10 @@
 
     <script>
         // ==========================================
-        // 1. COLE AQUI OS LINKS TSV DO GOOGLE SHEETS
+        // 1. LINKS TSV DO GOOGLE SHEETS
         // ==========================================
-        
-        // Link da aba "Aulas" (termina com output=tsv)
         const LINK_PLANILHA_AULAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=0&single=true&output=tsv";
-        
-        // Link da aba "Eventos" (termina com output=tsv)
         const LINK_PLANILHA_EVENTOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=1213067383&single=true&output=tsv";
-
         // ==========================================
 
 
@@ -331,14 +326,13 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Se os links não foram colados ainda, usa dados de exemplo temporários
-            if(LINK_PLANILHA_AULAS.includes("https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=0&single=true&output=tsv")) {
-                alert("AVISO PARA O DESENVOLVEDOR: Você precisa colar os links TSV do Google Sheets no código-fonte!");
-                liberarAcesso(); // Libera com arrays vazios só pra não travar a tela
+            if (!sessionStorage.getItem('splashShown')) {
+                document.getElementById('splash-screen').classList.remove('hidden');
             } else {
-                carregarBancoDeDados();
+                dismissSplash();
             }
-
+            
+            carregarBancoDeDados();
             if(lights.length === 0) { addLight('Principal', 8, 6); addLight('Preenchimento', 5, 5); }
         });
 
@@ -350,7 +344,7 @@
             if (cacheAulas && cacheEventos) {
                 processarAulas(cacheAulas);
                 processarEventos(cacheEventos);
-                liberarAcesso(); // Libera a tela imediatamente sem esperar o Google
+                liberarAcesso(); // Já libera a tela para o usuário não ficar preso!
             }
 
             // 2. Busca na internet as atualizações em segundo plano
@@ -361,57 +355,36 @@
                 const resEventos = await fetch(LINK_PLANILHA_EVENTOS);
                 const tsvEventos = await resEventos.text();
 
-                // 3. Verifica se a planilha está diferente do que está salvo no celular
+                // 3. Verifica se a planilha na web está diferente da memória do celular
                 if (tsvAulas !== cacheAulas || tsvEventos !== cacheEventos) {
-                    // Atualiza o banco de dados do celular
                     localStorage.setItem('tpf43m_aulas', tsvAulas);
                     localStorage.setItem('tpf43m_eventos', tsvEventos);
                     
-                    // Reprocessa os dados novos
                     processarAulas(tsvAulas);
                     processarEventos(tsvEventos);
                     
-                    // Atualiza a tela silenciosamente para o usuário
                     initAulas();
                     initEventos();
-
-                    // Se era o primeiro acesso da vida do usuário (não tinha cache), libera a tela agora
-                    if (!dadosCarregados) liberarAcesso();
-                } else if (!dadosCarregados) {
-                    // Segurança: Dados iguais, mas tela ainda presa
-                    liberarAcesso();
                 }
-
             } catch (error) {
                 console.error("Modo offline ou erro de conexão:", error);
                 if (!dadosCarregados) {
-                    // Só mostra erro se o aluno não tinha cache e está sem internet
-                    document.getElementById('loading-text').innerText = "Você está sem internet para fazer o primeiro download do cronograma.";
+                    document.getElementById('loading-text').innerText = "Você está offline. Exibindo apenas ferramentas locais.";
                 }
+            } finally {
+                // 4. INDEPENDENTE DE DAR CERTO OU ERRADO, LIBERA A TELA SEMPRE!
+                if (!dadosCarregados) liberarAcesso();
             }
         }
 
-        function liberarAcesso() {
-            dadosCarregados = true;
-            initAulas();
-            initEventos();
-
-            document.getElementById('loading-text').style.display = 'none';
-            document.getElementById('click-hint').classList.remove('hidden');
-
-            if (sessionStorage.getItem('splashShown')) {
-                dismissSplash();
-            }
-        }
         function processarAulas(tsv) {
-            const linhas = tsv.split('\n').slice(1); // Ignora a primeira linha (cabeçalho)
+            const linhas = tsv.split('\n').slice(1);
             aulasArray = [];
             
             linhas.forEach(linha => {
                 if(!linha.trim()) return;
                 const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, ''));
                 
-                // Esperado: Data | UC | Docente | Aula
                 if(colunas.length >= 4 && colunas[0] && colunas[1]) {
                     aulasArray.push({
                         data: colunas[0],
@@ -425,14 +398,13 @@
         }
 
         function processarEventos(tsv) {
-            const linhas = tsv.split('\n').slice(1); // Ignora cabeçalho
+            const linhas = tsv.split('\n').slice(1);
             baseEventos = [];
 
             linhas.forEach(linha => {
                 if(!linha.trim()) return;
                 const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, ''));
                 
-                // Esperado: Data | Titulo | Descricao
                 if(colunas.length >= 2 && colunas[0] && colunas[1]) {
                     baseEventos.push({
                         data: colunas[0],
@@ -457,7 +429,7 @@
         }
 
         function dismissSplash() {
-            if(!dadosCarregados) return; // Só permite sair se os dados chegaram
+            // Agora sempre pode entrar, pois os dados (ou as ferramentas offline) estarão liberadas
             sessionStorage.setItem('splashShown', 'true');
             document.getElementById('splash-screen').classList.add('hidden');
             document.getElementById('view-menu').classList.remove('hidden');
@@ -486,13 +458,13 @@
             const hojeD = hojeDate.getDate();
 
             if (baseEventos.length === 0) {
-                container.innerHTML = "<p>Nenhum evento registrado na planilha.</p>";
+                container.innerHTML = "<p style='text-align:center; color:#888;'>Não foi possível carregar os eventos no momento.</p>";
                 return;
             }
 
             baseEventos.forEach(ev => {
                 const [ano, mes, dia] = ev.data.split('-');
-                if(!ano || !mes || !dia) return; // Pula datas mal formatadas
+                if(!ano || !mes || !dia) return; 
 
                 const dataFormatada = `${dia}/${mes}/${ano}`;
                 const dataEvento = new Date(ano, mes - 1, dia);
@@ -603,7 +575,7 @@
             const aSemana = aulasArray.filter(a => a.data >= toISODate(seg) && a.data <= toISODate(sex));
             
             let html = `<h3 style="text-align:center;">Sua Semana</h3>`;
-            if (aSemana.length === 0) html += `<div class="card"><div class="details">Nenhuma aula programada.</div></div>`;
+            if (aSemana.length === 0) html += `<div class="card"><div class="details" style="text-align:center;">Nenhuma aula programada para esta semana.</div></div>`;
             
             aSemana.forEach(a => {
                 const isCancelled = a.aula.toLowerCase().includes('cancelada');
