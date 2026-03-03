@@ -155,14 +155,23 @@
 
         .aulas-container { display: flex; flex-direction: column; gap: 15px; }
         .card { background-color: var(--bg-panel); border-left: 5px solid var(--accent-aulas); padding: 20px; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
-        .card.past { border-left-color: #888; opacity: 0.7; }
+        
+        /* Aulas Passadas - Totalmente em Cinza */
+        .card.past { 
+            border-left-color: #555; 
+            background-color: #161616; 
+            opacity: 0.6; 
+        }
+        .card.past .status, .card.past .date, .card.past .details, .card.past .details span { 
+            color: #777 !important; 
+        }
+        
         .card.today { border-left-color: #e91e63; background-color: #2a1b20; }
         .card.tomorrow { border-left-color: var(--accent-warning); background-color: #2a2015; }
         .card.next { border-left-color: #2196f3; }
         .card.cancelled { border-left-color: #f44336; opacity: 0.8; }
         
         .status { font-size: 0.85em; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; }
-        .past .status { color: #aaa; } 
         .today .status { color: #ff4081; } 
         .tomorrow .status { color: var(--accent-warning); }
         .next .status { color: #64b5f6; } 
@@ -196,6 +205,20 @@
            5. EVENTOS
            ========================================== */
         .evento-card { background-color: var(--bg-panel); border-left: 5px solid var(--accent-eventos); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        
+        /* Eventos Passados - Em cinza */
+        .evento-card.past {
+            border-left-color: #555;
+            background-color: #161616;
+            opacity: 0.6;
+        }
+        .evento-card.past .evento-titulo, 
+        .evento-card.past .evento-desc, 
+        .evento-card.past .evento-data span,
+        .evento-card.past .evento-countdown {
+            color: #777 !important;
+        }
+
         .evento-data { color: var(--accent-eventos); font-weight: bold; font-size: 1em; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .evento-countdown { font-weight: normal; font-size: 0.85em; opacity: 0.8; }
         .evento-countdown.urgente { color: var(--accent-warning); font-weight: bold; opacity: 1; }
@@ -221,7 +244,7 @@
             Sincronizando banco de dados...
         </div>
         <div class="click-hint-splash hidden" id="click-hint">Toque em qualquer lugar para entrar</div>
-        <div class="splash-footer">Versão 4.4 | Desenvolvido por Harry Bour</div>
+        <div class="splash-footer">Versão 4.5 | Desenvolvido por Harry Bour</div>
     </div>
 
     <div id="view-menu" class="view hidden">
@@ -451,6 +474,8 @@
                 return;
             }
 
+            let eventosExibidos = 0;
+
             baseEventos.forEach(ev => {
                 const [ano, mes, dia] = ev.data.split('-');
                 if(!ano || !mes || !dia) return; 
@@ -458,17 +483,31 @@
                 const dataFormatada = `${dia}/${mes}/${ano}`;
                 const dataEvento = new Date(ano, mes - 1, dia);
                 const dataHojeLocal = new Date(hojeY, hojeM, hojeD);
-                const diffTime = dataEvento - dataHojeLocal;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffTime = dataEvento.getTime() - dataHojeLocal.getTime();
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                // REGRA 1: Ignora eventos que aconteceram há mais de 10 dias
+                if (diffDays < -10) return;
 
                 let countdownHTML = "";
-                if (diffDays > 1) { countdownHTML = `<span class="evento-countdown">(Faltam ${diffDays} dias)</span>`; } 
-                else if (diffDays === 1) { countdownHTML = `<span class="evento-countdown urgente">(É amanhã!)</span>`; } 
-                else if (diffDays === 0) { countdownHTML = `<span class="evento-countdown hoje">(É hoje!)</span>`; } 
-                else { countdownHTML = `<span class="evento-countdown">(Realizado)</span>`; }
+                let extraClass = "";
+
+                if (diffDays > 1) { 
+                    countdownHTML = `<span class="evento-countdown">(Faltam ${diffDays} dias)</span>`; 
+                } else if (diffDays === 1) { 
+                    countdownHTML = `<span class="evento-countdown urgente">(É amanhã!)</span>`; 
+                } else if (diffDays === 0) { 
+                    countdownHTML = `<span class="evento-countdown hoje">(É hoje!)</span>`; 
+                } else if (diffDays === -1) {
+                    countdownHTML = `<span class="evento-countdown">(Ontem)</span>`;
+                    extraClass = "past";
+                } else { 
+                    countdownHTML = `<span class="evento-countdown">(Há ${Math.abs(diffDays)} dias)</span>`;
+                    extraClass = "past";
+                }
 
                 html += `
-                    <div class="evento-card">
+                    <div class="evento-card ${extraClass}">
                         <div class="evento-data">
                             <span>📅 ${dataFormatada}</span>
                             ${countdownHTML}
@@ -477,7 +516,13 @@
                         <div class="evento-desc">${ev.desc}</div>
                     </div>
                 `;
+                eventosExibidos++;
             });
+
+            if (eventosExibidos === 0) {
+                html = "<p style='text-align:center; color:#888;'>Nenhum evento recente ou futuro programado.</p>";
+            }
+
             container.innerHTML = html;
         }
 
@@ -534,7 +579,10 @@
 
             if(dUC.length === 0) h += `<p>Nenhuma aula agendada na planilha.</p>`;
             dUC.forEach(a => {
-                h += `<div style="padding:10px 0; border-bottom:1px solid #333;" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
+                const isPast = a.data < hojeStr;
+                const rowStyle = isPast ? "padding:10px 0; border-bottom:1px solid #333; color:#777; opacity:0.6;" : "padding:10px 0; border-bottom:1px solid #333;";
+
+                h += `<div style="${rowStyle}" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
                         <strong>${formatarDataBR(a.data)}</strong> - Prof. ${a.docente} (Aula ${a.aula})
                       </div>`;
             });
@@ -594,17 +642,15 @@
                 <div class="card ${cardClass}" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')">
                     <div class="status">${statusMsg}</div>
                     <div class="date">${formatarDataBR(a.data)}</div>
-                    <div class="details"><span style="color:#fff;font-weight:bold;">${a.uc}</span><br>Prof: ${a.docente}</div>
+                    <div class="details"><span style="font-weight:bold;">${a.uc}</span><br>Prof: ${a.docente}</div>
                 </div>`;
             });
             document.getElementById('painel-aulas').innerHTML = html;
         }
 
         /* --- MÓDULO: CALCULADORA DE ESTÚDIO (HÍBRIDA) --- */
-        // Tabela completa de f-stops para o select
         const fStopsFull = ['f/1.0', 'f/1.4', 'f/2.0', 'f/2.8', 'f/4.0', 'f/5.6', 'f/8.0', 'f/11', 'f/16', 'f/22', 'f/32', 'f/45', 'f/64'];
         
-        // Tabela de dados para as regras de terços na Câmera
         const fStopsData = [
             { f: '1.0', t1: '1.1', t2: '1.2', next: '1.4' },
             { f: '1.4', t1: '1.6', t2: '1.8', next: '2.0' },
@@ -618,7 +664,7 @@
             { f: '22', t1: '25', t2: '29', next: '32' },
             { f: '32', t1: '36', t2: '40', next: '45' },
             { f: '45', t1: '51', t2: '57', next: '64' },
-            { f: '64', t1: '72', t2: '81', next: '90' } // Fallback para f/64
+            { f: '64', t1: '72', t2: '81', next: '90' }
         ];
 
         let lights = [];
@@ -654,7 +700,6 @@
             renderLights();
         }
 
-        // Nova função para resgatar a regra antiga dos terços
         function getCameraAdvice(stopIndex, tenths) {
             const stopData = fStopsData[stopIndex];
             let message = "";
@@ -728,7 +773,6 @@
                 `;
                 container.appendChild(row);
 
-                // Geração das respostas (Câmera + Tocha)
                 const resDiv = document.getElementById(`res-${light.id}`);
                 const advice = getCameraAdvice(light.baseStop, light.tenths);
                 const adviceStyle = advice.isWarning ? "color: var(--accent-warning); font-weight: bold;" : "color: #bbb;";
