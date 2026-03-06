@@ -261,19 +261,31 @@
         </div>
     </div>
 
-    <div id="view-dicio" class="view page-container hidden">
+  <div id="view-dicio" class="view page-container hidden">
         <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
         
         <h1 class="page-title" style="border-bottom-color: var(--accent-dicio);">Enciclopédia</h1>
         
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <button id="btn-toggle-dicio" onclick="toggleDicioMode()" style="background: transparent; color: var(--accent-dicio); border: 1px solid var(--accent-dicio); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+                🔤 Ver Índice A-Z
+            </button>
+        </div>
+
+        <div id="dicio-search-area" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
             <input type="text" id="buscaDicio" class="dicio-search" placeholder="Buscar termo ou palavra-chave..." onkeyup="filtrarDicio()">
             <select id="filtroCategoriaDicio" class="dicio-select" onchange="filtrarDicio()">
                 <option value="">Todas as Categorias</option>
-                </select>
+            </select>
         </div>
 
-        <div id="lista-dicio"></div>
+        <div id="dicio-alpha-area" class="hidden" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;">
+        </div>
+        
+        <div id="lista-dicio">
+            <p style="text-align:center; color:#888;">Nenhum dado vinculado ainda.</p>
+        </div>
+        <div class="clara-footer">C.L.A.R.A. BASE DE CONHECIMENTO</div>
     </div>
 
     <div id="view-suncalc" class="view page-container hidden">
@@ -436,12 +448,12 @@
         }
 
         // ==========================================
-        // ENCICLOPÉDIA (Processamento, Dropdown e Busca)
+        // MÓDULO DA ENCICLOPÉDIA (Processamento, Dropdown e Busca)
         // ==========================================
         function processarDicio(tsv) {
             const linhas = tratarTSV(tsv).slice(1); 
             dicioArray = [];
-            let categoriasSet = new Set(); // Guarda as categorias únicas
+            let categoriasSet = new Set(); // Coleta as categorias sem repetir
             
             if(linhas.length === 0) return;
             
@@ -457,28 +469,72 @@
                 }
             });
             
-            // Popula o menu Dropdown automaticamente
+            // Desenha as opções do Menu Dropdown automaticamente
             const selectCat = document.getElementById('filtroCategoriaDicio');
             if (selectCat) {
                 let optionsHtml = '<option value="">Todas as Categorias</option>';
-                // Ordena alfabeticamente
                 Array.from(categoriasSet).sort().forEach(c => {
                     optionsHtml += `<option value="${c}">${c}</option>`;
                 });
                 selectCat.innerHTML = optionsHtml;
             }
             
-            renderDicioSearch();
+            if (dicioMode === 'search') renderDicioSearch();
+        }
+
+        function toggleDicioMode() {
+            const btn = document.getElementById('btn-toggle-dicio');
+            const areaSearch = document.getElementById('dicio-search-area');
+            const areaAlpha = document.getElementById('dicio-alpha-area');
+            
+            if (dicioMode === 'search') {
+                dicioMode = 'index';
+                btn.innerText = "🔍 Voltar para Busca";
+                btn.style.backgroundColor = "var(--accent-dicio)";
+                btn.style.color = "#fff";
+                areaSearch.classList.add('hidden');
+                areaAlpha.classList.remove('hidden');
+                renderAlphabet();
+                renderDicioIndex(currentLetter);
+            } else {
+                dicioMode = 'search';
+                btn.innerText = "🔤 Ver Índice A-Z";
+                btn.style.backgroundColor = "transparent";
+                btn.style.color = "var(--accent-dicio)";
+                areaSearch.classList.remove('hidden');
+                areaAlpha.classList.add('hidden');
+                document.getElementById('buscaDicio').value = '';
+                renderDicioSearch();
+            }
+        }
+
+        function renderAlphabet() {
+            const cont = document.getElementById('dicio-alpha-area');
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+            let html = '';
+            letters.forEach(l => {
+                const activeClass = (l === currentLetter) ? 'active' : '';
+                html += `<div class="dicio-letter ${activeClass}" onclick="selectLetter('${l}')">${l}</div>`;
+            });
+            cont.innerHTML = html;
+        }
+
+        function selectLetter(l) {
+            currentLetter = l;
+            renderAlphabet();
+            renderDicioIndex(l);
         }
 
         function filtrarDicio() {
-            renderDicioSearch();
+            if (dicioMode === 'search') {
+                renderDicioSearch();
+            }
         }
 
         function renderDicioSearch() {
             const container = document.getElementById('lista-dicio');
             if (dicioArray.length === 0) {
-                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum dado de enciclopédia carregado.</p>"; return;
+                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum dado vinculado ainda.</p>"; return;
             }
 
             const inputFiltro = document.getElementById('buscaDicio').value.toLowerCase();
@@ -486,17 +542,57 @@
 
             let html = "";
 
-            // Filtra os itens com base no texto E na categoria selecionada
+            // Filtro Cruzado: Termo/Definição E Categoria Selecionada
             const itensFiltrados = dicioArray.filter(item => {
                 const matchTexto = item.termo.toLowerCase().includes(inputFiltro) || 
                                    item.definicao.toLowerCase().includes(inputFiltro);
                 const matchCat = catFiltro === "" || item.categoria === catFiltro;
                 return matchTexto && matchCat;
-            }).sort((a, b) => a.termo.localeCompare(b.termo)); // Ordem Alfabética
+            }).sort((a, b) => a.termo.localeCompare(b.termo));
 
             if (itensFiltrados.length === 0) {
-                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum termo encontrado com este filtro.</p>"; return;
+                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum termo encontrado.</p>"; return;
             }
+
+            itensFiltrados.forEach(item => {
+                html += `
+                    <div class="dicio-card">
+                        <div class="dicio-term">${item.termo}</div>
+                        <div class="dicio-cat">${item.categoria}</div>
+                        <div class="dicio-def">${item.definicao}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderDicioIndex(letter) {
+            const container = document.getElementById('lista-dicio');
+            if (dicioArray.length === 0) return;
+
+            const itensFiltrados = dicioArray.filter(item => item.termo.toUpperCase().startsWith(letter))
+                                             .sort((a, b) => a.termo.localeCompare(b.termo));
+
+            if (itensFiltrados.length === 0) {
+                container.innerHTML = `<p style='text-align:center; color:#888; margin-top:20px;'>Nenhum verbete com a letra <strong>${letter}</strong>.</p>`; return;
+            }
+
+            let html = '<div class="dicio-list-view">';
+            itensFiltrados.forEach(item => {
+                const termoSafe = item.termo.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const catSafe = item.categoria.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const defSafe = item.definicao.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '\\n');
+
+                html += `
+                    <div class="dicio-list-item" onclick="abrirVerbeteModal('${termoSafe}', '${catSafe}', '${defSafe}')">
+                        <div class="dicio-list-term">${item.termo}</div>
+                        <div class="dicio-list-def-preview">${item.definicao}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
 
             // Desenha os Cards
             itensFiltrados.forEach(item => {
