@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🎓 C.L.A.R.A. - TPF43M</title>
+    <title>🎓 C.L.A.R.A.</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -118,8 +118,6 @@
         .clara-logo-text { font-size: 2.8rem; font-weight: 800; letter-spacing: 4px; color: #fff; margin: 0; }
         .clara-tagline { color: var(--accent-snc); font-weight: bold; font-size: 0.9rem; margin-top: 8px; text-transform: uppercase; max-width: 80%; line-height: 1.4;}
         
-        .splash-curso { font-size: 1.1rem; color: var(--text-muted); margin: 15px 0 2px 0; }
-        .splash-turma { font-size: 1.4rem; font-weight: bold; color: #fff; margin: 10px 0; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 4px; display: inline-block;}
         .splash-footer { position: absolute; bottom: 20px; font-size: 0.8rem; color: #666; }
         .click-hint-splash { margin-top: 40px; font-size: 0.9rem; color: #555; animation: pulse 2s infinite; }
 
@@ -129,7 +127,7 @@
         #main-menu { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; gap: 15px; padding: 20px; }
         .menu-header { text-align: center; margin-bottom: 25px; animation: fadeIn 0.8s ease-in; display: flex; flex-direction: column; align-items: center;}
         
-        .menu-turma-badge { font-size: 1.2rem; color: #fff; background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 20px; font-weight: bold; display: inline-block; margin-top: 15px; letter-spacing: 1px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .menu-turma-badge { font-size: 0.85rem; color: #fff; background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 6px 15px; border-radius: 20px; font-weight: normal; display: inline-block; margin-top: 15px; letter-spacing: 1px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         
         .menu-btn { background-color: var(--bg-panel); border: 1px solid var(--border-color); color: #fff; width: 100%; max-width: 400px; padding: 20px 20px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s, background-color 0.2s; border-left: 5px solid transparent;}
         .menu-btn:hover { transform: translateY(-2px); background-color: #2a2a2a; }
@@ -234,7 +232,9 @@
         .evento-countdown.urgente { color: var(--accent-warning); font-weight: bold; opacity: 1; }
         .evento-countdown.hoje { color: #ff4081; font-weight: bold; opacity: 1; }
         .evento-titulo { font-size: 1.2em; color: #fff; margin-bottom: 5px; }
-        .evento-desc { color: #ccc; font-size: 0.95em; line-height: 1.4; }
+        
+        /* A REGRA PRE-WRAP AQUI GARANTE QUE O ALT+ENTER DO GOOGLE SHEETS FUNCIONE */
+        .evento-desc { color: #ccc; font-size: 0.95em; line-height: 1.4; white-space: pre-wrap; }
 
         /* ==========================================
            5. LUZ NATURAL E CALCULADORA
@@ -293,12 +293,10 @@
         <div style="font-size: 5rem; margin-bottom: 15px;">🎓</div>
         <div class="clara-logo-text">C.L.A.R.A.</div>
         <div class="clara-tagline">Central de Luz e Apoio ao Repertório de Alunos</div>
-        <div class="splash-curso">Técnico em Processos Fotográficos</div>
-        <div class="splash-turma">Turma 43M</div>
-        <div class="splash-curso">SNC Lapa - Scipião</div>
-        <div id="loading-text" style="color: var(--accent-snc); font-weight: bold; margin-top: 20px;">A carregar base de dados...</div>
+        
+        <div id="loading-text" style="color: var(--accent-snc); font-weight: bold; margin-top: 30px;">A carregar base de dados...</div>
         <div class="click-hint-splash hidden" id="click-hint">Toque em qualquer lugar para entrar</div>
-        <div class="splash-footer">Versão 5.8 | Desenvolvido por Harry Bour</div>
+        <div class="splash-footer">Versão 5.9 | Desenvolvido por Harry Bour</div>
     </div>
 
     <div id="view-menu" class="view hidden">
@@ -308,11 +306,11 @@
                     <div style="font-size: 2.2rem;">🎓</div>
                     <span style="font-size: 2.2rem; font-weight: 800; letter-spacing: 3px; color: #fff;">C.L.A.R.A.</span>
                 </div>
-                <div class="menu-turma-badge">Turma: SCI-TPF43M</div>
+                <div class="menu-turma-badge">Central de Luz e Apoio ao Repertório de Alunos</div>
             </div>
             
-            <button class="menu-btn btn-aulas" onclick="requireAuth('view-aulas')"><span class="menu-icon">📅</span> Crono de Aulas</button>
-            <button class="menu-btn btn-eventos" onclick="requireAuth('view-eventos')"><span class="menu-icon">📷</span> Eventos da Turma</button>
+            <button class="menu-btn btn-aulas" onclick="requireAuth('view-aulas')"><span class="menu-icon">📅</span> Crono de Aulas SCI-TPF43M</button>
+            <button class="menu-btn btn-eventos" onclick="requireAuth('view-eventos')"><span class="menu-icon">📷</span> Eventos da Turma SCI-TPF43M</button>
             
             <button class="menu-btn btn-datas" onclick="switchView('view-datas')"><span class="menu-icon">🌍</span> Datas de Interesse</button>
             
@@ -320,7 +318,7 @@
             <button class="menu-btn btn-sun" onclick="switchView('view-suncalc'); initSunCalc();"><span class="menu-icon">☀️</span> Luz Natural</button>
             <button class="menu-btn btn-calc" onclick="switchView('view-calc')"><span class="menu-icon">🧮</span> Mapa de Luz</button>
             
-            <div class="clara-footer">C.L.A.R.A. v5.8 | Desenvolvido por Harry Bour</div>
+            <div class="clara-footer">C.L.A.R.A. v5.9 | Desenvolvido por Harry Bour</div>
         </div>
     </div>
 
@@ -454,7 +452,7 @@
         <div id="weather-results" class="sun-card weather-card hidden"></div>
 
         <div id="suncalc-results"></div>
-        <div class="clara-footer">C.L.A.R.A. PHOTOMETRY UNIT</div>
+        <div class="clara-footer">C.L.A.R.A. ASSISTENTE DE LUZ DE CAMPO</div>
     </div>
 
     <div id="view-calc" class="view page-container hidden">
@@ -484,7 +482,7 @@
         const LINK_PLANILHA_DICIO = "COLE_AQUI_O_LINK_TSV_DA_ABA_ENCICLOPEDIA"; 
         
         // NOVO LINK PARA DATAS DE INTERESSE
-        const LINK_PLANILHA_DATAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=2069138341&single=true&output=tsv"; 
+        const LINK_PLANILHA_DATAS = "COLE_AQUI_O_LINK_TSV_DATAS_DE_INTERESSE"; 
         
         let aulasArray = []; 
         let baseEventos = []; 
@@ -597,6 +595,46 @@
         });
 
         // ==========================================
+        // NOVO PARSER TSV (O "Tradutor Inteligente")
+        // Resolve quebras de linha com Alt+Enter do Google Sheets
+        // ==========================================
+        function tratarTSV(tsv) {
+            let linhas = [];
+            let celulaAtual = "";
+            let linhaAtual = [];
+            let dentroDeAspas = false;
+
+            for (let i = 0; i < tsv.length; i++) {
+                let char = tsv[i];
+                if (char === '"') {
+                    if (dentroDeAspas && tsv[i + 1] === '"') {
+                        celulaAtual += '"';
+                        i++; // Pula as aspas de escape
+                    } else {
+                        dentroDeAspas = !dentroDeAspas;
+                    }
+                } else if (char === '\t' && !dentroDeAspas) {
+                    linhaAtual.push(celulaAtual);
+                    celulaAtual = "";
+                } else if (char === '\n' && !dentroDeAspas) {
+                    linhaAtual.push(celulaAtual.replace(/\r$/, '')); // Limpa carriage return
+                    linhas.push(linhaAtual);
+                    linhaAtual = [];
+                    celulaAtual = "";
+                } else {
+                    celulaAtual += char;
+                }
+            }
+            
+            // Adiciona o que sobrou
+            if (celulaAtual || linhaAtual.length > 0) {
+                linhaAtual.push(celulaAtual.replace(/\r$/, ''));
+                linhas.push(linhaAtual);
+            }
+            return linhas;
+        }
+
+        // ==========================================
         // CARREGAMENTO DE DADOS (CACHE E OFFLINE)
         // ==========================================
         async function carregarBancoDeDados() {
@@ -663,54 +701,62 @@
             }
         }
 
-        // Funções de Processamento de TSV
+        // Funções de Processamento usando tratarTSV()
         function processarAulas(tsv) { 
-            const linhas = tsv.split('\n').slice(1); 
+            const linhas = tratarTSV(tsv).slice(1); 
             aulasArray = []; 
-            linhas.forEach(linha => { 
-                if (!linha.trim()) return; 
-                const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, '')); 
-                if (colunas.length >= 4 && colunas[0] && colunas[1]) {
+            linhas.forEach(colunas => { 
+                if (colunas.length >= 4 && colunas[0] && colunas[1] && colunas[0].trim() !== '') {
                     aulasArray.push({
-                        data: colunas[0], codigoUC: colunas[1], uc: `${colunas[1]} - ${nomesUC[colunas[1]] || ''}`, docente: colunas[2], aula: colunas[3]
+                        data: colunas[0].trim(), 
+                        codigoUC: colunas[1].trim(), 
+                        uc: `${colunas[1].trim()} - ${nomesUC[colunas[1].trim()] || ''}`, 
+                        docente: colunas[2].trim(), 
+                        aula: colunas[3].trim()
                     }); 
                 }
             }); 
         }
 
         function processarEventos(tsv) { 
-            const linhas = tsv.split('\n').slice(1); 
+            const linhas = tratarTSV(tsv).slice(1); 
             baseEventos = []; 
-            linhas.forEach(linha => { 
-                if (!linha.trim()) return; 
-                const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, '')); 
-                if (colunas.length >= 2 && colunas[0] && colunas[1]) {
-                    baseEventos.push({ data: colunas[0], titulo: colunas[1], desc: colunas[2] || '' }); 
+            linhas.forEach(colunas => { 
+                if (colunas.length >= 2 && colunas[0] && colunas[0].trim() !== '') {
+                    baseEventos.push({ 
+                        data: colunas[0].trim(), 
+                        titulo: colunas[1] ? colunas[1].trim() : '', 
+                        desc: colunas[2] ? colunas[2].trim() : '' 
+                    }); 
                 }
             }); 
         }
 
         function processarDatas(tsv) { 
-            const linhas = tsv.split('\n').slice(1); 
+            const linhas = tratarTSV(tsv).slice(1); 
             baseDatas = []; 
-            linhas.forEach(linha => { 
-                if (!linha.trim()) return; 
-                const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, '')); 
-                if (colunas.length >= 2 && colunas[0] && colunas[1]) {
-                    baseDatas.push({ data: colunas[0], titulo: colunas[1], desc: colunas[2] || '' }); 
+            linhas.forEach(colunas => { 
+                if (colunas.length >= 2 && colunas[0] && colunas[0].trim() !== '') {
+                    baseDatas.push({ 
+                        data: colunas[0].trim(), 
+                        titulo: colunas[1] ? colunas[1].trim() : '', 
+                        desc: colunas[2] ? colunas[2].trim() : '' 
+                    }); 
                 }
             }); 
-            initDatas(); // Renderiza sempre que processar
+            if (baseDatas.length > 0) initDatas(); // Renderiza sempre que processar
         }
 
         function processarDicio(tsv) {
-            const linhas = tsv.split('\n').slice(1); 
+            const linhas = tratarTSV(tsv).slice(1); 
             dicioArray = [];
-            linhas.forEach(linha => {
-                if (!linha.trim()) return;
-                const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, ''));
-                if (colunas.length >= 3 && colunas[0]) {
-                    dicioArray.push({ termo: colunas[0], categoria: colunas[1] || 'Geral', definicao: colunas[2] });
+            linhas.forEach(colunas => {
+                if (colunas.length >= 3 && colunas[0] && colunas[0].trim() !== '') {
+                    dicioArray.push({ 
+                        termo: colunas[0].trim(), 
+                        categoria: colunas[1] ? colunas[1].trim() : 'Geral', 
+                        definicao: colunas[2] ? colunas[2].trim() : '' 
+                    });
                 }
             });
             if (dicioMode === 'search') renderDicioSearch();
@@ -927,11 +973,10 @@
                 const diffTime = dataEvento.getTime() - dataHojeLocal.getTime();
                 const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
                 
-                // Ignora eventos passados há mais de 10 dias
-                if (diffDays < -10) return; 
+                // REGRA ATUALIZADA: Todos os eventos passados ficam visíveis no histórico
                 
                 let countdownHTML = ""; 
-                let extraClass = "datas-int"; // Classe extra para cor Ciano
+                let extraClass = "datas-int"; 
                 
                 if (diffDays > 1) { countdownHTML = `<span class="evento-countdown">(Faltam ${diffDays} dias)</span>`; } 
                 else if (diffDays === 1) { countdownHTML = `<span class="evento-countdown urgente">(É amanhã!)</span>`; } 
