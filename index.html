@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>C.L.A.R.A. - TPF43M</title>
+    <title>🎓 C.L.A.R.A. - TPF43M</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-title" content="🎓 C.L.A.R.A.">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 
@@ -110,7 +114,7 @@
             animation: fadeIn 0.5s ease-in; 
         }
         
-        /* Ícones C.L.A.R.A. (Câmera/Lente/Olho) */
+        /* Ícones C.L.A.R.A. antigos mantidos no CSS caso precise reverter */
         .clara-icon { width: 70px; height: 70px; fill: var(--accent-snc); margin-bottom: 15px; }
         .clara-icon-small { width: 35px; height: 35px; fill: var(--accent-snc); }
         
@@ -237,9 +241,7 @@
 
     <div id="splash-screen" class="hidden" onclick="dismissSplash()">
         
-        <svg class="clara-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2Zm0 18A8 8 0 1 1 20 12A8 8 0 0 1 12 20Zm0-13A5 5 0 1 0 17 12A5 5 0 0 0 12 7Zm0 8A3 3 0 1 1 15 12A3 3 0 0 1 12 15Z" />
-        </svg>
+        <div style="font-size: 5rem; margin-bottom: 15px;">🎓</div>
 
         <div class="clara-logo-text">C.L.A.R.A.</div>
         <div class="clara-tagline">Central de Luz e Apoio ao Repertório de Alunos</div>
@@ -250,16 +252,14 @@
         
         <div id="loading-text" style="color: var(--accent-snc); font-weight: bold; margin-top: 20px;">A carregar base de dados...</div>
         <div class="click-hint-splash hidden" id="click-hint">Toque em qualquer lugar para entrar</div>
-        <div class="splash-footer">Versão 5.3 | Desenvolvido por Harry Bour</div>
+        <div class="splash-footer">Versão 5.4 | Desenvolvido por Harry Bour</div>
     </div>
 
     <div id="view-menu" class="view hidden">
         <div id="main-menu">
             <div class="menu-header">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                    <svg class="clara-icon-small" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2Zm0 18A8 8 0 1 1 20 12A8 8 0 0 1 12 20Zm0-13A5 5 0 1 0 17 12A5 5 0 0 0 12 7Zm0 8A3 3 0 1 1 15 12A3 3 0 0 1 12 15Z" />
-                    </svg>
+                    <div style="font-size: 2.2rem;">🎓</div>
                     <span style="font-size: 2.2rem; font-weight: 800; letter-spacing: 3px; color: #fff;">C.L.A.R.A.</span>
                 </div>
                 <div class="menu-turma-badge">Turma: SCI-TPF43M</div>
@@ -271,7 +271,7 @@
             <button class="menu-btn btn-sun" onclick="switchView('view-suncalc'); initSunCalc();"><span class="menu-icon">☀️</span> Luz Natural</button>
             <button class="menu-btn btn-calc" onclick="switchView('view-calc')"><span class="menu-icon">🧮</span> Mapa de Luz</button>
             
-            <div class="clara-footer">C.L.A.R.A. v5.3 | Desenvolvido por Harry Bour</div>
+            <div class="clara-footer">C.L.A.R.A. v5.4 | Desenvolvido por Harry Bour</div>
         </div>
     </div>
 
@@ -291,7 +291,7 @@
         <div class="aulas-container" id="painel-aulas"></div>
         <div class="aulas-container" id="resultado-pesquisa" style="display: none;"></div>
         
-        <div class="clara-footer" style="padding-bottom: 80px;">C.L.A.R.A. ASSISTANT</div>
+        <div class="clara-footer" style="padding-bottom: 80px;">C.L.A.R.A. ASSISTENTE DE CRONOGRAMA</div>
         
         <div class="footer-nav" id="rodape-semanas">
             <div class="footer-nav-inner">
@@ -323,7 +323,7 @@
         </div>
         
         <div id="lista-eventos"></div>
-        <div class="clara-footer">C.L.A.R.A. ASSISTANT</div>
+        <div class="clara-footer">C.L.A.R.A. ASSISTENTE DE AGENDA</div>
     </div>
 
     <div id="view-dicio" class="view page-container hidden">
@@ -351,7 +351,7 @@
         <div id="lista-dicio">
             <p style="text-align:center; color:#888;">Nenhum dado vinculado ainda.</p>
         </div>
-        <div class="clara-footer">C.L.A.R.A. KNOWLEDGE BASE</div>
+        <div class="clara-footer">C.L.A.R.A. BASE DE CONHECIMENTO</div>
     </div>
 
     <div id="view-suncalc" class="view page-container hidden">
@@ -378,7 +378,7 @@
 
         <button class="btn-add-luz" onclick="addLight()">+ Adicionar Ponto de Luz (Principal + 5)</button>
         <div id="lightsContainer"></div>
-        <div class="clara-footer">C.L.A.R.A. STUDIO ASSISTANT</div>
+        <div class="clara-footer">C.L.A.R.A. ASSISTENTE DE ESTÚDIO</div>
     </div>
 
     <script>
