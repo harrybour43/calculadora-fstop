@@ -21,7 +21,7 @@
             --accent-aulas: #4caf50;
             --accent-eventos: #9c27b0;
             --accent-sun: #ffb300;
-            --accent-dicio: #e91e63; /* Cor da Enciclopédia */
+            --accent-dicio: #e91e63;
             --accent-warning: #ff9800; 
             --border-color: #333;
         }
@@ -32,6 +32,7 @@
         .btn-voltar:hover { background-color: #2a2a2a; }
         .page-container { padding: 20px; max-width: 800px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; padding-bottom: 80px; }
         h1.page-title { color: #fff; margin-top: 0; margin-bottom: 20px; font-weight: 300; text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        
         .disclaimer-box { background-color: rgba(255, 152, 0, 0.1); border-left: 4px solid var(--accent-warning); color: var(--text-main); padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.5; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .disclaimer-box strong { color: var(--accent-warning); }
 
@@ -84,10 +85,12 @@
         .footer-nav-inner { display: flex; justify-content: space-between; width: 100%; max-width: 600px; gap: 5px; }
         .footer-nav button { background-color: #2c2c2c; color: #ccc; border: 1px solid #444; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-weight: bold; }
         .footer-nav button.active { background-color: var(--accent-aulas); color: white; border-color: var(--accent-aulas); }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: var(--bg-panel); border-top: 5px solid var(--accent-eventos); padding: 25px; border-radius: 12px; width: 100%; max-width: 500px; position: relative; }
+        .modal-box { background: var(--bg-panel); border-top: 5px solid var(--accent-eventos); padding: 25px; border-radius: 12px; width: 100%; max-width: 500px; position: relative; max-height: 80vh; overflow-y: auto;}
         .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #aaa; font-size: 1.8em; cursor: pointer; }
         .modal-header { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
+        
         .evento-card { background-color: var(--bg-panel); border-left: 5px solid var(--accent-eventos); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .evento-card.past { border-left-color: #555; background-color: #161616; opacity: 0.6; }
         .evento-card.past .evento-titulo, .evento-card.past .evento-desc, .evento-card.past .evento-data span, .evento-card.past .evento-countdown { color: #777 !important; }
@@ -129,6 +132,18 @@
         .dicio-term { font-size: 1.2em; font-weight: bold; color: #fff; margin-bottom: 5px; }
         .dicio-cat { font-size: 0.8em; background: #333; padding: 4px 10px; border-radius: 12px; color: var(--accent-dicio); display: inline-block; margin-bottom: 10px; font-weight: bold; letter-spacing: 0.5px;}
         .dicio-def { font-size: 0.95em; color: #ccc; line-height: 1.5; white-space: pre-wrap;}
+        
+        /* Estilos do Modo A-Z */
+        .dicio-letter { background: #2c2c2c; color: #fff; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 4px; cursor: pointer; border: 1px solid #444; font-weight: bold; transition: 0.2s;}
+        .dicio-letter:hover, .dicio-letter.active { background: var(--accent-dicio); border-color: var(--accent-dicio); }
+        
+        .dicio-list-view { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .dicio-list-view { grid-template-columns: 1fr; } }
+        
+        .dicio-list-item { background: var(--bg-panel); padding: 12px 15px; border-radius: 6px; border-left: 3px solid var(--accent-dicio); cursor: pointer; transition: 0.2s;}
+        .dicio-list-item:hover { background: #2a2a2a; }
+        .dicio-list-term { font-weight: bold; color: #fff; margin-bottom: 3px; font-size: 1.1em;}
+        .dicio-list-def-preview { font-size: 0.85em; color: #888; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -142,7 +157,7 @@
         <div class="splash-curso">SCI-TPF43M</div>
         <div id="loading-text" style="color: var(--accent-snc); font-weight: bold; margin-top: 20px;">A carregar base de dados...</div>
         <div class="click-hint-splash hidden" id="click-hint">Toque em qualquer lugar para entrar</div>
-        <div class="splash-footer">Versão 5.0 | Desenvolvido por Harry Bour</div>
+        <div class="splash-footer">Versão 5.1 | Desenvolvido por Harry Bour</div>
     </div>
 
     <div id="view-menu" class="view hidden">
@@ -184,11 +199,11 @@
         <div class="modal-box">
             <button class="modal-close" onclick="fecharModalBtn()">&times;</button>
             <div class="modal-header">
-                <div id="modalData" style="font-size: 0.9em; color: #aaa; text-transform: uppercase;">Data</div>
-                <div id="modalUC" style="font-size: 1.2em; font-weight: bold; color: #fff;">UC e Aula</div>
+                <div id="modalData" style="font-size: 0.9em; color: #aaa; text-transform: uppercase;">Data/Categoria</div>
+                <div id="modalUC" style="font-size: 1.2em; font-weight: bold; color: #fff;">UC/Termo</div>
                 <div id="modalProf" style="color: var(--accent-eventos); font-weight: bold;">Professor</div>
             </div>
-            <div id="modalTexto" style="line-height: 1.6; white-space: pre-wrap;">Detalhes adicionais não fornecidos na base de dados.</div>
+            <div id="modalTexto" style="line-height: 1.6; white-space: pre-wrap; color: #e0e0e0;">Detalhes adicionais não fornecidos.</div>
         </div>
     </div>
 
@@ -203,12 +218,28 @@
 
     <div id="view-dicio" class="view page-container hidden">
         <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
-        <h1 class="page-title" style="border-bottom-color: var(--accent-dicio);">Enciclopédia</h1>
         
-        <input type="text" id="buscaDicio" class="dicio-search" placeholder="Buscar termo, palavra-chave ou conceito..." onkeyup="filtrarDicio()">
+        <h1 class="page-title" style="border-bottom-color: var(--accent-dicio);">
+            Enciclopédia 🚧
+            <br>
+            <span style="font-size: 0.45em; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Ferramenta em desenvolvimento</span>
+        </h1>
+        
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <button id="btn-toggle-dicio" onclick="toggleDicioMode()" style="background: transparent; color: var(--accent-dicio); border: 1px solid var(--accent-dicio); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+                🔤 Ver Índice A-Z
+            </button>
+        </div>
+
+        <div id="dicio-search-area">
+            <input type="text" id="buscaDicio" class="dicio-search" placeholder="Buscar termo, categoria ou dica..." onkeyup="filtrarDicio()">
+        </div>
+
+        <div id="dicio-alpha-area" class="hidden" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;">
+            </div>
         
         <div id="lista-dicio">
-            <p style="text-align:center; color:#888;">Carregando dicionário...</p>
+            <p style="text-align:center; color:#888;">Nenhum dado vinculado ainda.</p>
         </div>
     </div>
 
@@ -237,11 +268,11 @@
     </div>
 
     <script>
-        // 1. LINKS DO GOOGLE SHEETS
+        // LINKS DO GOOGLE SHEETS
         const LINK_PLANILHA_AULAS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=0&single=true&output=tsv";
         const LINK_PLANILHA_EVENTOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=1213067383&single=true&output=tsv";
         
-        // NOVO: Link da aba Enciclopédia (Substitua o link abaixo pela sua nova aba TSV)
+        // Link da Enciclopédia (Substitua quando criar a aba)
         const LINK_PLANILHA_DICIO = "COLE_AQUI_O_LINK_TSV_DA_ABA_ENCICLOPEDIA"; 
         
         let aulasArray = []; 
@@ -266,37 +297,28 @@
             }
         });
 
-        // LÓGICA DO SPLASH (1 a cada 10 sessões)
+        // SPLASH SCREEN (1x a cada 10 sessões)
         function gerenciarSplash() {
-            // Se já tem uma sessão ativa nesta aba do navegador, não mostra
             if (sessionStorage.getItem('sessionActive')) {
                 document.getElementById('splash-screen').classList.add('hidden');
                 document.getElementById('view-menu').classList.remove('hidden');
                 return;
             }
-
-            // Marca que a sessão começou
             sessionStorage.setItem('sessionActive', 'true');
-            
-            // Checa a contagem no localStorage
             let count = parseInt(localStorage.getItem('visitCount') || '0');
-            
             if (count === 0 || count >= 10) {
-                // Mostra o Splash e reseta o contador para 1
                 document.getElementById('splash-screen').classList.remove('hidden');
                 localStorage.setItem('visitCount', '1');
             } else {
-                // Esconde o Splash e incrementa
                 localStorage.setItem('visitCount', (count + 1).toString());
                 document.getElementById('splash-screen').classList.add('hidden');
                 document.getElementById('view-menu').classList.remove('hidden');
             }
         }
 
-        // BANCO DE DADOS (Agora com 3 planilhas)
+        // BANCO DE DADOS
         async function carregarBancoDeDados() {
             try {
-                // Tenta puxar Aulas e Eventos simultaneamente
                 const [resAulas, resEventos] = await Promise.all([
                     fetch(LINK_PLANILHA_AULAS),
                     fetch(LINK_PLANILHA_EVENTOS)
@@ -304,11 +326,9 @@
                 
                 const tsvAulas = await resAulas.text();
                 const tsvEventos = await resEventos.text();
-                
                 processarAulas(tsvAulas); 
                 processarEventos(tsvEventos); 
                 
-                // Tenta puxar o Dicionário de forma segura (não quebra se o link ainda não for válido)
                 if (LINK_PLANILHA_DICIO.startsWith("http")) {
                     const resDicio = await fetch(LINK_PLANILHA_DICIO);
                     if (resDicio.ok) {
@@ -316,9 +336,8 @@
                         processarDicio(tsvDicio);
                     }
                 }
-                
             } catch (error) { 
-                console.error("Modo Offline Ativado:", error); 
+                console.error("Offline:", error); 
                 if (!dadosCarregados) document.getElementById('loading-text').innerText = "Offline. Modo local ativado."; 
             } finally { 
                 liberarAcesso(); 
@@ -326,85 +345,106 @@
         }
 
         function processarAulas(tsv) { 
-            const linhas = tsv.split('\n').slice(1); 
-            aulasArray = []; 
+            const linhas = tsv.split('\n').slice(1); aulasArray = []; 
             linhas.forEach(linha => { 
                 if(!linha.trim()) return; 
                 const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, '')); 
-                if(colunas.length >= 4 && colunas[0] && colunas[1]) {
-                    aulasArray.push({
-                        data: colunas[0], codigoUC: colunas[1], uc: `${colunas[1]} - ${nomesUC[colunas[1]] || ''}`, docente: colunas[2], aula: colunas[3]
-                    }); 
-                }
+                if(colunas.length >= 4 && colunas[0] && colunas[1]) aulasArray.push({data: colunas[0], codigoUC: colunas[1], uc: `${colunas[1]} - ${nomesUC[colunas[1]] || ''}`, docente: colunas[2], aula: colunas[3]}); 
             }); 
         }
 
         function processarEventos(tsv) { 
-            const linhas = tsv.split('\n').slice(1); 
-            baseEventos = []; 
+            const linhas = tsv.split('\n').slice(1); baseEventos = []; 
             linhas.forEach(linha => { 
                 if(!linha.trim()) return; 
                 const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, '')); 
-                if(colunas.length >= 2 && colunas[0] && colunas[1]) {
-                    baseEventos.push({ data: colunas[0], titulo: colunas[1], desc: colunas[2] || '' }); 
-                }
+                if(colunas.length >= 2 && colunas[0] && colunas[1]) baseEventos.push({ data: colunas[0], titulo: colunas[1], desc: colunas[2] || '' }); 
             }); 
         }
 
-        // NOVO: Processar Dicionário
         function processarDicio(tsv) {
-            const linhas = tsv.split('\n').slice(1); // Pula cabeçalho
-            dicioArray = [];
+            const linhas = tsv.split('\n').slice(1); dicioArray = [];
             linhas.forEach(linha => {
                 if(!linha.trim()) return;
                 const colunas = linha.split('\t').map(col => col.trim().replace(/^"|"$/g, ''));
-                // Precisa ter pelo menos Termo(0) e Definição(2)
                 if(colunas.length >= 3 && colunas[0]) {
-                    dicioArray.push({
-                        termo: colunas[0],
-                        categoria: colunas[1] || 'Geral',
-                        definicao: colunas[2]
-                    });
+                    dicioArray.push({ termo: colunas[0], categoria: colunas[1] || 'Geral', definicao: colunas[2] });
                 }
             });
-            renderDicio(); // Renderiza a lista inicial
+            if(dicioMode === 'search') renderDicioSearch();
         }
 
-        function liberarAcesso() { 
-            dadosCarregados = true; 
-            initAulas(); 
-            initEventos(); 
-            document.getElementById('loading-text').style.display = 'none'; 
-            document.getElementById('click-hint').classList.remove('hidden'); 
-        }
+        function liberarAcesso() { dadosCarregados = true; initAulas(); initEventos(); document.getElementById('loading-text').style.display = 'none'; document.getElementById('click-hint').classList.remove('hidden'); }
+        function dismissSplash() { document.getElementById('splash-screen').classList.add('hidden'); document.getElementById('view-menu').classList.remove('hidden'); }
+        function switchView(viewId) { document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); document.getElementById(viewId).classList.remove('hidden'); const rodapeAulas = document.getElementById('rodape-semanas'); if(rodapeAulas) { rodapeAulas.style.display = (viewId === 'view-aulas' && document.getElementById('filtroUC').value === "") ? 'flex' : 'none'; } window.scrollTo(0,0); }
 
-        function dismissSplash() { 
-            document.getElementById('splash-screen').classList.add('hidden'); 
-            document.getElementById('view-menu').classList.remove('hidden'); 
-        }
+        // ==========================================
+        // LÓGICA DA ENCICLOPÉDIA (CARDS VS LISTA A-Z)
+        // ==========================================
+        let dicioMode = 'search'; // 'search' ou 'index'
+        let currentLetter = 'A';
 
-        function switchView(viewId) { 
-            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
-            document.getElementById(viewId).classList.remove('hidden'); 
-            const rodapeAulas = document.getElementById('rodape-semanas'); 
-            if(rodapeAulas) {
-                rodapeAulas.style.display = (viewId === 'view-aulas' && document.getElementById('filtroUC').value === "") ? 'flex' : 'none'; 
+        function toggleDicioMode() {
+            const btn = document.getElementById('btn-toggle-dicio');
+            const areaSearch = document.getElementById('dicio-search-area');
+            const areaAlpha = document.getElementById('dicio-alpha-area');
+            
+            if (dicioMode === 'search') {
+                dicioMode = 'index';
+                btn.innerText = "🔍 Voltar para Busca";
+                btn.style.backgroundColor = "var(--accent-dicio)";
+                btn.style.color = "#fff";
+                areaSearch.classList.add('hidden');
+                areaAlpha.classList.remove('hidden');
+                renderAlphabet();
+                renderDicioIndex(currentLetter);
+            } else {
+                dicioMode = 'search';
+                btn.innerText = "🔤 Ver Índice A-Z";
+                btn.style.backgroundColor = "transparent";
+                btn.style.color = "var(--accent-dicio)";
+                areaSearch.classList.remove('hidden');
+                areaAlpha.classList.add('hidden');
+                document.getElementById('buscaDicio').value = '';
+                renderDicioSearch();
             }
-            window.scrollTo(0,0); 
         }
 
-        // LÓGICA DA ENCICLOPÉDIA (NOVO)
-        function renderDicio(filtro = "") {
+        function renderAlphabet() {
+            const cont = document.getElementById('dicio-alpha-area');
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+            let html = '';
+            letters.forEach(l => {
+                const activeClass = l === currentLetter ? 'active' : '';
+                html += `<div class="dicio-letter ${activeClass}" onclick="selectLetter('${l}')">${l}</div>`;
+            });
+            cont.innerHTML = html;
+        }
+
+        function selectLetter(l) {
+            currentLetter = l;
+            renderAlphabet();
+            renderDicioIndex(l);
+        }
+
+        function filtrarDicio() {
+            if (dicioMode === 'search') {
+                const valor = document.getElementById('buscaDicio').value;
+                renderDicioSearch(valor);
+            }
+        }
+
+        // Renderiza no modo BUSCA (Cards completos)
+        function renderDicioSearch(filtro = "") {
             const container = document.getElementById('lista-dicio');
             if (dicioArray.length === 0) {
-                container.innerHTML = "<p style='text-align:center; color:#888;'>Planilha de Enciclopédia não conectada ou vazia.</p>";
+                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum dado vinculado ainda.</p>";
                 return;
             }
 
             let html = "";
             const filtroLower = filtro.toLowerCase();
 
-            // Filtra e organiza por ordem alfabética do Termo
             const itensFiltrados = dicioArray.filter(item => {
                 return item.termo.toLowerCase().includes(filtroLower) || 
                        item.categoria.toLowerCase().includes(filtroLower) ||
@@ -412,8 +452,7 @@
             }).sort((a, b) => a.termo.localeCompare(b.termo));
 
             if (itensFiltrados.length === 0) {
-                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum termo encontrado.</p>";
-                return;
+                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum termo encontrado.</p>"; return;
             }
 
             itensFiltrados.forEach(item => {
@@ -425,25 +464,59 @@
                     </div>
                 `;
             });
-
             container.innerHTML = html;
         }
 
-        function filtrarDicio() {
-            const valor = document.getElementById('buscaDicio').value;
-            renderDicio(valor);
+        // Renderiza no modo ÍNDICE A-Z (Lista em 2 colunas)
+        function renderDicioIndex(letter) {
+            const container = document.getElementById('lista-dicio');
+            if (dicioArray.length === 0) {
+                container.innerHTML = "<p style='text-align:center; color:#888;'>Nenhum dado vinculado ainda.</p>";
+                return;
+            }
+
+            // Filtra os que começam com a letra escolhida
+            const itensFiltrados = dicioArray.filter(item => item.termo.toUpperCase().startsWith(letter))
+                                             .sort((a, b) => a.termo.localeCompare(b.termo));
+
+            if (itensFiltrados.length === 0) {
+                container.innerHTML = `<p style='text-align:center; color:#888; margin-top:20px;'>Nenhum verbete registrado com a letra <strong>${letter}</strong>.</p>`;
+                return;
+            }
+
+            let html = '<div class="dicio-list-view">';
+            itensFiltrados.forEach(item => {
+                // Prepara as strings para não quebrarem o Javascript do onclick
+                const termoSafe = item.termo.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const catSafe = item.categoria.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const defSafe = item.definicao.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, '\\n');
+
+                html += `
+                    <div class="dicio-list-item" onclick="abrirVerbeteModal('${termoSafe}', '${catSafe}', '${defSafe}')">
+                        <div class="dicio-list-term">${item.termo}</div>
+                        <div class="dicio-list-def-preview">${item.definicao}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
         }
 
-        // LÓGICA DE EVENTOS (Mantida integralmente)
-        function initEventos() { 
-            const container = document.getElementById('lista-eventos'); let html = ''; baseEventos.sort((a, b) => new Date(a.data) - new Date(b.data)); const hojeDate = new Date(); const hojeY = hojeDate.getFullYear(); const hojeM = hojeDate.getMonth(); const hojeD = hojeDate.getDate(); if (baseEventos.length === 0) { container.innerHTML = "<p style='text-align:center; color:#888;'>Sem eventos.</p>"; return; } let eventosExibidos = 0; baseEventos.forEach(ev => { const [ano, mes, dia] = ev.data.split('-'); if(!ano || !mes || !dia) return; const diffDays = Math.round((new Date(ano, mes - 1, dia).getTime() - new Date(hojeY, hojeM, hojeD).getTime()) / (1000 * 60 * 60 * 24)); if (diffDays < -10) return; let countdownHTML = ""; let extraClass = ""; if (diffDays > 1) countdownHTML = `<span class="evento-countdown">(Faltam ${diffDays} dias)</span>`; else if (diffDays === 1) countdownHTML = `<span class="evento-countdown urgente">(É amanhã!)</span>`; else if (diffDays === 0) countdownHTML = `<span class="evento-countdown hoje">(É hoje!)</span>`; else if (diffDays === -1) { countdownHTML = `<span class="evento-countdown">(Ontem)</span>`; extraClass = "past"; } else { countdownHTML = `<span class="evento-countdown">(Há ${Math.abs(diffDays)} dias)</span>`; extraClass = "past"; } html += `<div class="evento-card ${extraClass}"><div class="evento-data"><span>📅 ${dia}/${mes}/${ano}</span>${countdownHTML}</div><div class="evento-titulo">${ev.titulo}</div><div class="evento-desc">${ev.desc}</div></div>`; eventosExibidos++; }); if (eventosExibidos === 0) html = "<p style='text-align:center; color:#888;'>Nenhum evento recente.</p>"; container.innerHTML = html; 
+        // Reuso do Modal para a Enciclopédia
+        function abrirVerbeteModal(termo, categoria, definicao) {
+            document.getElementById('modalData').innerText = categoria;
+            document.getElementById('modalData').style.color = "var(--accent-dicio)"; // Pinta de Rosa
+            document.getElementById('modalUC').innerText = termo;
+            document.getElementById('modalProf').innerText = ""; // Oculta o professor
+            document.getElementById('modalTexto').innerText = definicao;
+            document.getElementById('modalConteudo').style.display = 'flex'; 
+            document.body.style.overflow = 'hidden'; 
         }
 
-        // LÓGICA DE AULAS (Mantida integralmente)
-        function toISODate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; } 
-        function formatarDataBR(iso) { const [a, m, d] = iso.split('-'); return `${d}/${m}/${a}`; } 
-        function getDiaDaSemana(iso) { return ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][new Date(iso.split('-')[0], iso.split('-')[1] - 1, iso.split('-')[2], 12, 0, 0).getDay()]; } 
-        function abrirModal(dataISO, ucNome, profNome, numAula) { document.getElementById('modalData').innerText = `${getDiaDaSemana(dataISO)}, ${formatarDataBR(dataISO)}`; document.getElementById('modalUC').innerText = `${ucNome} - Aula ${numAula}`; document.getElementById('modalProf').innerText = `Prof. ${profNome}`; document.getElementById('modalConteudo').style.display = 'flex'; document.body.style.overflow = 'hidden'; } 
+        // LÓGICA DE EVENTOS E AULAS (Mantida)
+        function initEventos() { const container = document.getElementById('lista-eventos'); let html = ''; baseEventos.sort((a, b) => new Date(a.data) - new Date(b.data)); const hojeDate = new Date(); const hojeY = hojeDate.getFullYear(); const hojeM = hojeDate.getMonth(); const hojeD = hojeDate.getDate(); if (baseEventos.length === 0) { container.innerHTML = "<p style='text-align:center; color:#888;'>Sem eventos.</p>"; return; } let eventosExibidos = 0; baseEventos.forEach(ev => { const [ano, mes, dia] = ev.data.split('-'); if(!ano || !mes || !dia) return; const diffDays = Math.round((new Date(ano, mes - 1, dia).getTime() - new Date(hojeY, hojeM, hojeD).getTime()) / (1000 * 60 * 60 * 24)); if (diffDays < -10) return; let countdownHTML = ""; let extraClass = ""; if (diffDays > 1) countdownHTML = `<span class="evento-countdown">(Faltam ${diffDays} dias)</span>`; else if (diffDays === 1) countdownHTML = `<span class="evento-countdown urgente">(É amanhã!)</span>`; else if (diffDays === 0) countdownHTML = `<span class="evento-countdown hoje">(É hoje!)</span>`; else if (diffDays === -1) { countdownHTML = `<span class="evento-countdown">(Ontem)</span>`; extraClass = "past"; } else { countdownHTML = `<span class="evento-countdown">(Há ${Math.abs(diffDays)} dias)</span>`; extraClass = "past"; } html += `<div class="evento-card ${extraClass}"><div class="evento-data"><span>📅 ${dia}/${mes}/${ano}</span>${countdownHTML}</div><div class="evento-titulo">${ev.titulo}</div><div class="evento-desc">${ev.desc}</div></div>`; eventosExibidos++; }); if (eventosExibidos === 0) html = "<p style='text-align:center; color:#888;'>Nenhum evento recente.</p>"; container.innerHTML = html; }
+        
+        function abrirModal(dataISO, ucNome, profNome, numAula) { document.getElementById('modalData').innerText = `${getDiaDaSemana(dataISO)}, ${formatarDataBR(dataISO)}`; document.getElementById('modalData').style.color = "#aaa"; document.getElementById('modalUC').innerText = `${ucNome} - Aula ${numAula}`; document.getElementById('modalProf').innerText = `Prof. ${profNome}`; document.getElementById('modalTexto').innerText = "Detalhes adicionais não fornecidos na base de dados."; document.getElementById('modalConteudo').style.display = 'flex'; document.body.style.overflow = 'hidden'; } 
         function fecharModal(e) { if (e.target.id === 'modalConteudo') fecharModalBtn(); } 
         function fecharModalBtn() { document.getElementById('modalConteudo').style.display = 'none'; document.body.style.overflow = 'auto'; } 
         function initAulas() { const select = document.getElementById('filtroUC'); select.innerHTML = '<option value="">-- Selecione uma UC para ver todas as datas --</option>'; for (const [codigo, nome] of Object.entries(nomesUC)) { const opt = document.createElement('option'); opt.value = codigo; opt.textContent = `${codigo} - ${nome}`; select.appendChild(opt); } mudarSemana(0); } 
@@ -451,13 +524,13 @@
         window.limparBusca = function() { document.getElementById('filtroUC').value = ""; document.getElementById('resultado-pesquisa').style.display = 'none'; document.getElementById('painel-aulas').style.display = 'flex'; document.getElementById('rodape-semanas').style.display = 'flex'; } 
         function mudarSemana(offset) { document.getElementById('btn-passada').classList.toggle('active', offset === -1); document.getElementById('btn-atual').classList.toggle('active', offset === 0); document.getElementById('btn-que-vem').classList.toggle('active', offset === 1); const hoje = new Date(); const seg = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - hoje.getDay() + 1 + (offset * 7), 12, 0, 0); const sex = new Date(seg.getFullYear(), seg.getMonth(), seg.getDate() + 4, 12, 0, 0); const hojeStr = toISODate(hoje); const amanha = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + 1); const amanhaStr = toISODate(amanha); const aSemana = aulasArray.filter(a => a.data >= toISODate(seg) && a.data <= toISODate(sex)); let html = `<h3 style="text-align:center;">Sua Semana</h3>`; if (aSemana.length === 0) { html += `<div class="card"><div class="details" style="text-align:center;">Nenhuma aula programada para esta semana.</div></div>`; } aSemana.forEach(a => { const isCancelled = a.aula.toLowerCase().includes('cancelada'); let cardClass = ''; let statusMsg = ''; if (isCancelled) { cardClass = 'cancelled'; statusMsg = `❌ CANCELADA - ${getDiaDaSemana(a.data)}`; } else { if (a.data === hojeStr) { cardClass = 'today'; statusMsg = '🔥 HOJE'; } else if (a.data === amanhaStr) { cardClass = 'tomorrow'; statusMsg = `${getDiaDaSemana(a.data)} - AMANHÃ! ⚡`; } else if (a.data < hojeStr) { cardClass = 'past'; statusMsg = `✅ ${getDiaDaSemana(a.data)}`; } else { cardClass = 'next'; statusMsg = `⏳ ${getDiaDaSemana(a.data)}`; } } html += `<div class="card ${cardClass}" onclick="abrirModal('${a.data}', '${a.uc}', '${a.docente}', '${a.aula}')"><div class="status">${statusMsg}</div><div class="date">${formatarDataBR(a.data)}</div><div class="details"><span style="font-weight:bold;">${a.uc}</span><br>Prof: ${a.docente}</div></div>`; }); document.getElementById('painel-aulas').innerHTML = html; }
 
-        // LÓGICA DE LUZ NATURAL (Mantida integralmente)
+        // LÓGICA DE LUZ NATURAL (SUNCALC)
         function formatTime(date) { if (isNaN(date.getTime())) return "--:--"; return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
         function renderSunCalc(lat, lng, locationName) { const today = new Date(); const times = SunCalc.getTimes(today, lat, lng); let html = `<div style="margin-bottom: 15px; color: var(--text-muted); font-size: 0.9em; text-align: center;">📍 Referência: <strong>${locationName}</strong></div>`; html += `<div class="sun-card"><span class="label">🌅 Nascer do Sol</span><span class="time">${formatTime(times.sunrise)}</span></div><div class="sun-card golden"><span class="label">✨ Hora Dourada (Manhã)</span><span class="time">${formatTime(times.sunriseEnd)} - ${formatTime(times.goldenHourEnd)}</span></div><div class="sun-card golden"><span class="label">✨ Hora Dourada (Tarde)</span><span class="time">${formatTime(times.goldenHour)} - ${formatTime(times.sunsetStart)}</span></div><div class="sun-card"><span class="label">🌇 Pôr do Sol</span><span class="time">${formatTime(times.sunset)}</span></div><div class="sun-card blue"><span class="label">🌃 Hora Azul</span><span class="time">${formatTime(times.sunset)} - ${formatTime(times.dusk)}</span></div>`; document.getElementById('suncalc-results').innerHTML = html; }
         function initSunCalc() { renderSunCalc(-23.5266, -46.6963, "SNC Lapa Scipião (São Paulo)"); }
         function getMyLocation() { const btn = document.getElementById('btn-gps'); const btnOriginalText = btn.innerText; btn.innerText = "Buscando..."; btn.disabled = true; if ("geolocation" in navigator) { navigator.geolocation.getCurrentPosition((position) => { renderSunCalc(position.coords.latitude, position.coords.longitude, "Sua localização atual (GPS)"); btn.innerText = "📍 Atualizado!"; btn.style.borderColor = "#4caf50"; btn.style.color = "#4caf50"; setTimeout(() => { btn.innerText = btnOriginalText; btn.style.borderColor = "var(--accent-sun)"; btn.style.color = "var(--accent-sun)"; btn.disabled = false; }, 3000); }, (error) => { alert("Erro ao obter GPS."); btn.innerText = btnOriginalText; btn.disabled = false; }, { timeout: 10000 }); } else { alert("Geolocalização não suportada."); btn.innerText = btnOriginalText; btn.disabled = false; } }
 
-        // LÓGICA CALCULADORA DE ESTÚDIO (Mantida integralmente)
+        // LÓGICA CALCULADORA DE ESTÚDIO (INTENÇÃO)
         const fStopsFull = ['f/1.0', 'f/1.4', 'f/2.0', 'f/2.8', 'f/4.0', 'f/5.6', 'f/8.0', 'f/11', 'f/16', 'f/22', 'f/32', 'f/45', 'f/64'];
         const fStopsData = [ { f: '1.0', t1: '1.1', t2: '1.2', next: '1.4' }, { f: '1.4', t1: '1.6', t2: '1.8', next: '2.0' }, { f: '2.0', t1: '2.2', t2: '2.5', next: '2.8' }, { f: '2.8', t1: '3.2', t2: '3.5', next: '4.0' }, { f: '4.0', t1: '4.5', t2: '5.0', next: '5.6' }, { f: '5.6', t1: '6.3', t2: '7.1', next: '8.0' }, { f: '8.0', t1: '9.0', t2: '10', next: '11' }, { f: '11', t1: '13', t2: '14', next: '16' }, { f: '16', t1: '18', t2: '20', next: '22' }, { f: '22', t1: '25', t2: '29', next: '32' }, { f: '32', t1: '36', t2: '40', next: '45' }, { f: '45', t1: '51', t2: '57', next: '64' }, { f: '64', t1: '72', t2: '81', next: '90' } ];
         let lights = []; let lightIdCounter = 0; function getAbsoluteValue(stopIndex, tenths) { return (stopIndex * 10) + tenths; }
