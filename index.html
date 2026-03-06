@@ -114,6 +114,10 @@
             animation: fadeIn 0.5s ease-in; 
         }
         
+        /* Ícones C.L.A.R.A. antigos mantidos no CSS caso precise reverter */
+        .clara-icon { width: 70px; height: 70px; fill: var(--accent-snc); margin-bottom: 15px; }
+        .clara-icon-small { width: 35px; height: 35px; fill: var(--accent-snc); }
+        
         .clara-logo-text { font-size: 2.8rem; font-weight: 800; letter-spacing: 4px; color: #fff; margin: 0; }
         .clara-tagline { color: var(--accent-snc); font-weight: bold; font-size: 0.9rem; margin-top: 8px; text-transform: uppercase; max-width: 80%; line-height: 1.4;}
         
@@ -200,7 +204,7 @@
         .calc-settings { background-color: var(--bg-panel); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--accent-calc); }
         .calc-settings label { font-weight: bold; color: #ccc; display: block; margin-bottom: 8px;}
         .calc-settings select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #444; background-color: #2c2c2c; color: white; font-size: 1em;}
-        .calc-settings input[type="date"] { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #444; background-color: #2c2c2c; color: white; font-size: 1em; font-family: inherit; box-sizing: border-box; }
+        .calc-settings input[type="date"], .calc-settings input[type="text"] { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #444; background-color: #2c2c2c; color: white; font-size: 1em; font-family: inherit; box-sizing: border-box; }
         /* Ajuste para o ícone de calendário no input date em WebKit */
         .calc-settings input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         
@@ -251,7 +255,7 @@
         
         <div id="loading-text" style="color: var(--accent-snc); font-weight: bold; margin-top: 20px;">A carregar base de dados...</div>
         <div class="click-hint-splash hidden" id="click-hint">Toque em qualquer lugar para entrar</div>
-        <div class="splash-footer">Versão 5.5 | Desenvolvido por Harry Bour</div>
+        <div class="splash-footer">Versão 5.6 | Desenvolvido por Harry Bour</div>
     </div>
 
     <div id="view-menu" class="view hidden">
@@ -270,7 +274,7 @@
             <button class="menu-btn btn-sun" onclick="switchView('view-suncalc'); initSunCalc();"><span class="menu-icon">☀️</span> Luz Natural</button>
             <button class="menu-btn btn-calc" onclick="switchView('view-calc')"><span class="menu-icon">🧮</span> Mapa de Luz</button>
             
-            <div class="clara-footer">C.L.A.R.A. v5.5 | Desenvolvido por Harry Bour</div>
+            <div class="clara-footer">C.L.A.R.A. v5.6 | Desenvolvido por Harry Bour</div>
         </div>
     </div>
 
@@ -357,8 +361,14 @@
         <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
         <h1 class="page-title" style="border-bottom-color: var(--accent-sun);">Luz Natural</h1>
         
-        <div class="calc-settings">
-            <label for="dataSunCalc">Selecione a data do ensaio:</label>
+        <div class="calc-settings" style="border-left-color: var(--accent-sun);">
+            <label for="buscaLocalSunCalc">Localidade do ensaio:</label>
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <input type="text" id="buscaLocalSunCalc" placeholder="Ex: Ubatuba, SP..." style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid #444; background-color: #2c2c2c; color: white; font-size: 1em;">
+                <button id="btn-buscar-local" onclick="buscarLocalidadeSunCalc()" style="background-color: var(--accent-sun); color: #121212; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s;">Buscar</button>
+            </div>
+            
+            <label for="dataSunCalc">Data do ensaio:</label>
             <input type="date" id="dataSunCalc" onchange="atualizarDataSunCalc()">
         </div>
         
@@ -953,7 +963,7 @@
         }
 
         // ==========================================
-        // MÓDULO DE LUZ NATURAL (SUNCALC) COM CALENDÁRIO
+        // MÓDULO DE LUZ NATURAL (SUNCALC COM BUSCA E EDUCAÇÃO)
         // ==========================================
         let locLat = -23.5266; 
         let locLng = -46.6963;
@@ -962,6 +972,40 @@
         function formatTime(date) { 
             if (isNaN(date.getTime())) return "--:--"; 
             return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); 
+        }
+
+        // Nova função educativa C.L.A.R.A. para traduzir Azimute e Altitude
+        function getEducativeInfo(time, lat, lng) {
+            if (isNaN(time.getTime())) return "";
+            
+            const pos = SunCalc.getPosition(time, lat, lng);
+            let altDeg = pos.altitude * 180 / Math.PI;
+            // O azimute no SunCalc: 0 é Sul, vai para Oeste. Convertendo para bússola normal:
+            let aziDeg = (pos.azimuth * 180 / Math.PI) + 180;
+            
+            let altText = "";
+            if (altDeg < 0) altText = "Abaixo do horizonte (Luz suave/indireta)";
+            else if (altDeg < 15) altText = "Muito baixo (Sombras longas e dramáticas)";
+            else if (altDeg < 45) altText = "Baixo (Sombras médias, luz modeladora)";
+            else if (altDeg < 75) altText = "Alto (Sombras curtas, maior contraste)";
+            else altText = "A pino (Sombras duras e verticais, use rebatedor)";
+
+            let dir = "";
+            if (aziDeg >= 337.5 || aziDeg < 22.5) dir = "Norte (N)";
+            else if (aziDeg < 67.5) dir = "Nordeste (NE)";
+            else if (aziDeg < 112.5) dir = "Leste (L)";
+            else if (aziDeg < 157.5) dir = "Sudeste (SE)";
+            else if (aziDeg < 202.5) dir = "Sul (S)";
+            else if (aziDeg < 247.5) dir = "Sudoeste (SO)";
+            else if (aziDeg < 292.5) dir = "Oeste (O)";
+            else dir = "Noroeste (NO)";
+
+            return `
+                <div style="font-size: 0.8em; color: #aaa; margin-top: 8px; font-weight: normal; line-height: 1.4; border-top: 1px dashed #444; padding-top: 8px; width: 100%;">
+                    📐 <strong>Altura (${Math.round(altDeg)}°):</strong> ${altText}<br>
+                    🧭 <strong>Direção:</strong> A luz vem do ${dir}
+                </div>
+            `;
         }
         
         function renderSunCalc(targetDate) { 
@@ -974,25 +1018,40 @@
             `; 
             
             html += `
-                <div class="sun-card">
-                    <span class="label">🌅 Nascer do Sol</span>
-                    <span class="time">${formatTime(times.sunrise)}</span>
+                <div class="sun-card" style="flex-direction: column; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="label">🌅 Nascer do Sol</span>
+                        <span class="time">${formatTime(times.sunrise)}</span>
+                    </div>
+                    ${getEducativeInfo(times.sunrise, locLat, locLng)}
                 </div>
-                <div class="sun-card golden">
-                    <span class="label">✨ Hora Dourada (Manhã)</span>
-                    <span class="time">${formatTime(times.sunriseEnd)} - ${formatTime(times.goldenHourEnd)}</span>
+                <div class="sun-card golden" style="flex-direction: column; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="label">✨ Hora Dourada (Manhã)</span>
+                        <span class="time">${formatTime(times.sunriseEnd)} - ${formatTime(times.goldenHourEnd)}</span>
+                    </div>
+                    ${getEducativeInfo(times.sunriseEnd, locLat, locLng)}
                 </div>
-                <div class="sun-card golden">
-                    <span class="label">✨ Hora Dourada (Tarde)</span>
-                    <span class="time">${formatTime(times.goldenHour)} - ${formatTime(times.sunsetStart)}</span>
+                <div class="sun-card golden" style="flex-direction: column; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="label">✨ Hora Dourada (Tarde)</span>
+                        <span class="time">${formatTime(times.goldenHour)} - ${formatTime(times.sunsetStart)}</span>
+                    </div>
+                    ${getEducativeInfo(times.goldenHour, locLat, locLng)}
                 </div>
-                <div class="sun-card">
-                    <span class="label">🌇 Pôr do Sol</span>
-                    <span class="time">${formatTime(times.sunset)}</span>
+                <div class="sun-card" style="flex-direction: column; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="label">🌇 Pôr do Sol</span>
+                        <span class="time">${formatTime(times.sunset)}</span>
+                    </div>
+                    ${getEducativeInfo(times.sunset, locLat, locLng)}
                 </div>
-                <div class="sun-card blue">
-                    <span class="label">🌃 Hora Azul</span>
-                    <span class="time">${formatTime(times.sunset)} - ${formatTime(times.dusk)}</span>
+                <div class="sun-card blue" style="flex-direction: column; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="label">🌃 Hora Azul</span>
+                        <span class="time">${formatTime(times.sunset)} - ${formatTime(times.dusk)}</span>
+                    </div>
+                    ${getEducativeInfo(times.dusk, locLat, locLng)}
                 </div>
             `; 
             
@@ -1003,7 +1062,6 @@
             const hoje = new Date();
             const dataInput = document.getElementById('dataSunCalc');
             
-            // Define o valor inicial do input para hoje no formato YYYY-MM-DD
             if(!dataInput.value) {
                 dataInput.value = toISODate(hoje);
             }
@@ -1016,9 +1074,39 @@
             if(!dataString) return;
             
             const [ano, mes, dia] = dataString.split('-');
-            const targetDate = new Date(ano, mes - 1, dia, 12, 0, 0); // Meio-dia para evitar fuso horário
+            const targetDate = new Date(ano, mes - 1, dia, 12, 0, 0); 
             
             renderSunCalc(targetDate);
+        }
+
+        // Função para buscar latitude/longitude por nome de cidade/local (OpenStreetMap API)
+        async function buscarLocalidadeSunCalc() {
+            const query = document.getElementById('buscaLocalSunCalc').value;
+            if (!query) return;
+            
+            const btn = document.getElementById('btn-buscar-local');
+            const originalText = btn.innerText;
+            btn.innerText = "...";
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                
+                if (data && data.length > 0) {
+                    locLat = parseFloat(data[0].lat);
+                    locLng = parseFloat(data[0].lon);
+                    locName = data[0].display_name.split(',')[0] + " - Busca"; 
+                    atualizarDataSunCalc(); 
+                } else {
+                    alert("Localidade não encontrada. Tente um nome mais específico.");
+                }
+            } catch(e) {
+                alert("Erro ao buscar localidade. Verifique sua conexão com a internet.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
         
         function getMyLocation() { 
@@ -1036,8 +1124,11 @@
                         locName = "Sua localização atual (GPS)";
                         
                         const dataString = document.getElementById('dataSunCalc').value;
-                        const [ano, mes, dia] = dataString.split('-');
-                        const targetDate = new Date(ano, mes - 1, dia, 12, 0, 0);
+                        let targetDate = new Date();
+                        if (dataString) {
+                            const [ano, mes, dia] = dataString.split('-');
+                            targetDate = new Date(ano, mes - 1, dia, 12, 0, 0);
+                        }
 
                         renderSunCalc(targetDate); 
                         
@@ -1053,14 +1144,14 @@
                         }, 3000); 
                     }, 
                     (error) => { 
-                        alert("Erro ao obter GPS."); 
+                        alert("Erro ao obter GPS. Verifique as permissões do navegador."); 
                         btn.innerText = btnOriginalText; 
                         btn.disabled = false; 
                     }, 
                     { timeout: 10000 }
                 ); 
             } else { 
-                alert("Geolocalização não suportada."); 
+                alert("Geolocalização não suportada no seu navegador."); 
                 btn.innerText = btnOriginalText; 
                 btn.disabled = false; 
             } 
