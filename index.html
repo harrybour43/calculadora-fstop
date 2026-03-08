@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#121212">
-    <meta name="apple-mobile-web-app-title" content="🎓 CLARA">
+    <meta name="apple-mobile-web-app-title" content="CLARA">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
@@ -227,7 +227,7 @@
         .modal-header { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
 
         /* ==========================================
-           4. EVENTOS E AGENDA V4.2.3 (Filtros + Cores)
+           4. EVENTOS E AGENDA V4.3.0 (Filtros + Cores)
            ========================================== */
         /* Filtros Inteligentes (Chips) - Modificado para ter título normal */
         .filter-container { background-color: var(--bg-panel); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); }
@@ -360,7 +360,7 @@
         <div id="loading-text" style="color: var(--accent-snc); font-weight: bold; margin-top: 30px;">Sincronizando bancos de dados...</div>
         <button id="btn-entrar" class="btn-entrar hidden" onclick="dismissSplash()">ENTRAR NA CLARA</button>
 
-        <div class="splash-footer">Versão 4.2.3 | Desenvolvido por Harry Bour | 2026</div>
+        <div class="splash-footer">Versão 4.3.0 | Desenvolvido por Harry Bour | 2026</div>
     </div>
 
     <div id="view-menu" class="view hidden">
@@ -383,7 +383,7 @@
                         <button class="menu-btn btn-turma" onclick="requireAuth('view-turma-menu')"><span class="menu-icon">🔒</span> Área da Turma SCI-TPF43M</button>
 
             
-            <div class="clara-footer">CLARA Versão 4.2.3 | Desenvolvido por Harry Bour | 2026</div>
+            <div class="clara-footer">CLARA Versão 4.3.0 | Desenvolvido por Harry Bour | 2026</div>
         </div>
     </div>
 
@@ -570,7 +570,7 @@
         let currentLetter = 'A';
         let targetViewAfterAuth = '';
 
-        // Controles Filtros Agenda V4.2.3
+        // Controles Filtros Agenda V4.3.0
         let filtrosCatAtivos = new Set();
         let filtrosUFAtivos = new Set();
 
@@ -582,7 +582,7 @@
         };
 
         // ==========================================
-        // INICIALIZAÇÃO V4.2.3 (ONLINE ESTÁVEL)
+        // INICIALIZAÇÃO V4.3.0 (ONLINE ESTÁVEL)
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             const currentVersion = "4.2.1";
@@ -829,7 +829,7 @@
         }
 
         // ==========================================
-        // MÓDULO: AGENDA V4.2.3 (Filtros e Cores)
+        // MÓDULO: AGENDA V4.3.0 (Filtros e Cores)
         // ==========================================
         
         // Identificador Dinâmico de Classes CSS (Desmembrado para 10 Categorias)
