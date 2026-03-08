@@ -523,8 +523,8 @@
         <button class="btn-voltar" onclick="switchView('view-menu')">⬅ Menu Principal</button>
         
         <div style="position: relative;">
-            <h1 class="page-title" style="border-bottom-color: var(--accent-calc);">Mapa de Luz</h1>
-            <button onclick="abrirModalGuiaLuz()" style="position: absolute; right: 0; top: 0; background: transparent; color: var(--accent-calc); border: 2px solid var(--accent-calc); border-radius: 50%; width: 32px; height: 32px; font-weight: bold; cursor: pointer; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; padding: 0;" title="Guia do Mapa de Luz">?</button>
+            <h1 class="page-title" style="border-bottom-color: var(--accent-calc);">Luz de Estúdio</h1>
+            <button onclick="abrirModalGuiaLuz()" style="position: absolute; right: 0; top: 0; background: transparent; color: var(--accent-calc); border: 2px solid var(--accent-calc); border-radius: 50%; width: 32px; height: 32px; font-weight: bold; cursor: pointer; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; padding: 0;" title="Orientações para uso da calculadora de Luz de Estúdio">?</button>
         </div>
         
         <div class="calc-settings">
@@ -1101,7 +1101,7 @@
             document.body.style.overflow = 'hidden'; 
         }
         
-        // NOVA FUNÇÃO: MODAL DO GUIA DO MAPA DE LUZ
+        // NOVA FUNÇÃO: MODAL DO GUIA DO LUZ DE ESTÚDIO
         function abrirModalGuiaLuz() {
             document.getElementById('modalData').innerText = "LUZ DE ESTÚDIO";
             document.getElementById('modalData').style.color = "var(--accent-calc)"; 
