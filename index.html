@@ -872,7 +872,8 @@
         
         let filtrosCatAtivos = new Set(); 
         let filtrosUFAtivos = new Set();
-        let filtroUltimosDiasAtivo = false; // NOVO: Controla o filtro de urgência
+        let filtroUltimosDiasAtivo = false; 
+        let filtroEmBreveAtivo = false; // Adicionamos o controle do "Em Breve"
 
         const nomesUC = { 
             "UC1": "Captar imagens", 
@@ -1587,26 +1588,31 @@
 
             let setCat = new Set(); 
             let setUF = new Set(); 
-            let temUltimosDias = false; // Rastreador de urgência
+            let temUltimosDias = false; 
+            let temEmBreve = false;
             
             const hojeObj = new Date();
             hojeObj.setHours(0,0,0,0);
+            const hojeTime = hojeObj.getTime();
 
             baseDatas.forEach(function(d) { 
-                d.categorias.forEach(function(catObj) { 
-                    setCat.add(catObj.nome); 
-                }); 
-                if(d.uf) {
-                    setUF.add(d.uf); 
-                }
+                d.categorias.forEach(function(catObj) { setCat.add(catObj.nome); }); 
+                if(d.uf) { setUF.add(d.uf); }
                 
-                // Verifica se o evento está a 7 dias ou menos de acabar
-                const dtFimObj = new Date(d.dtFim.ano, d.dtFim.mes - 1, d.dtFim.dia);
-                const diffTime = dtFimObj.getTime() - hojeObj.getTime();
-                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                // Conversão de datas para cálculo preciso
+                const dtInicObj = new Date(d.dtInic.ano, d.dtInic.mes - 1, d.dtInic.dia).getTime();
+                const dtFimObj = new Date(d.dtFim.ano, d.dtFim.mes - 1, d.dtFim.dia).getTime();
                 
-                if (diffDays >= 0 && diffDays <= 7) {
+                const diffInicDays = Math.round((dtInicObj - hojeTime) / (1000 * 60 * 60 * 24));
+                const diffFimDays = Math.round((dtFimObj - hojeTime) / (1000 * 60 * 60 * 24));
+                
+                // REGRA 1: Já começou (ou começa hoje) e termina em até 7 dias
+                if (diffInicDays <= 0 && diffFimDays >= 0 && diffFimDays <= 7) {
                     temUltimosDias = true;
+                }
+                // REGRA 2: Ainda não começou, mas começa em até 7 dias
+                if (diffInicDays > 0 && diffInicDays <= 7) {
+                    temEmBreve = true;
                 }
             });
 
@@ -1629,20 +1635,35 @@
             });
             boxUF.innerHTML = htmlUF;
 
-            // Renderiza o Botão de Últimos Dias (Se houver eventos válidos)
+            // Renderiza os Botões de Urgência
             if (boxUrgencia && tituloUrgencia) {
-                if (temUltimosDias) {
+                if (temUltimosDias || temEmBreve) {
                     tituloUrgencia.style.display = 'block';
                     boxUrgencia.style.display = 'flex';
-                    let classAtivo = filtroUltimosDiasAtivo ? 'active' : '';
-                    let estiloExtra = filtroUltimosDiasAtivo 
-                        ? 'border-color: var(--accent-warning); background: var(--accent-warning); color: #000;' 
-                        : 'border-color: var(--accent-warning); color: var(--accent-warning); background: transparent;';
-                    boxUrgencia.innerHTML = `<div class="filter-chip ${classAtivo}" style="${estiloExtra}" onclick="toggleFiltroUltimosDias()">🚨 ÚLTIMOS DIAS</div>`;
+                    let chipsHTML = '';
+                    
+                    if (temUltimosDias) {
+                        let classAtivo = filtroUltimosDiasAtivo ? 'active' : '';
+                        let estiloExtra = filtroUltimosDiasAtivo 
+                            ? 'border-color: var(--accent-danger); background: var(--accent-danger); color: #fff;' 
+                            : 'border-color: var(--accent-danger); color: var(--accent-danger); background: transparent;';
+                        chipsHTML += `<div class="filter-chip ${classAtivo}" style="${estiloExtra}" onclick="toggleFiltroUrgencia('ultimos')">🚨 ÚLTIMOS DIAS</div>`;
+                    }
+                    
+                    if (temEmBreve) {
+                        let classAtivo = filtroEmBreveAtivo ? 'active' : '';
+                        let estiloExtra = filtroEmBreveAtivo 
+                            ? 'border-color: var(--accent-warning); background: var(--accent-warning); color: #000;' 
+                            : 'border-color: var(--accent-warning); color: var(--accent-warning); background: transparent;';
+                        chipsHTML += `<div class="filter-chip ${classAtivo}" style="${estiloExtra}" onclick="toggleFiltroUrgencia('breve')">⏳ EM BREVE</div>`;
+                    }
+                    
+                    boxUrgencia.innerHTML = chipsHTML;
                 } else {
                     tituloUrgencia.style.display = 'none';
                     boxUrgencia.style.display = 'none';
                     filtroUltimosDiasAtivo = false;
+                    filtroEmBreveAtivo = false;
                 }
             }
         }
@@ -1675,8 +1696,14 @@
             initDatas();
         }
 
-        function toggleFiltroUltimosDias() {
-            filtroUltimosDiasAtivo = !filtroUltimosDiasAtivo;
+        function toggleFiltroUrgencia(tipo) {
+            if (tipo === 'ultimos') {
+                filtroUltimosDiasAtivo = !filtroUltimosDiasAtivo;
+                filtroEmBreveAtivo = false; // Desmarca o outro
+            } else if (tipo === 'breve') {
+                filtroEmBreveAtivo = !filtroEmBreveAtivo;
+                filtroUltimosDiasAtivo = false; // Desmarca o outro
+            }
             renderFiltrosAgenda();
             initDatas();
         }
@@ -1697,6 +1724,7 @@
             const hojeISO = toISODate(new Date()); 
             const hojeObj = new Date();
             hojeObj.setHours(0,0,0,0);
+            const hojeTime = hojeObj.getTime();
             
             let datasExibidas = 0; 
             
@@ -1707,19 +1735,21 @@
                 });
                 
                 if (!temCategoriaAtiva) return;
-                
                 if (filtrosUFAtivos.size > 0 && (!ev.uf || !filtrosUFAtivos.has(ev.uf))) return;
 
-                // Cálculo de Urgência
-                const dtFimObj = new Date(ev.dtFim.ano, ev.dtFim.mes - 1, ev.dtFim.dia);
-                const diffTime = dtFimObj.getTime() - hojeObj.getTime();
-                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-                const isUltimosDias = diffDays >= 0 && diffDays <= 7;
+                // Cálculo de Urgência Matemática
+                const dtInicObj = new Date(ev.dtInic.ano, ev.dtInic.mes - 1, ev.dtInic.dia).getTime();
+                const dtFimObj = new Date(ev.dtFim.ano, ev.dtFim.mes - 1, ev.dtFim.dia).getTime();
+                
+                const diffInicDays = Math.round((dtInicObj - hojeTime) / (1000 * 60 * 60 * 24));
+                const diffFimDays = Math.round((dtFimObj - hojeTime) / (1000 * 60 * 60 * 24));
+                
+                const isUltimosDias = diffInicDays <= 0 && diffFimDays >= 0 && diffFimDays <= 7;
+                const isEmBreve = diffInicDays > 0 && diffInicDays <= 7;
 
-                // Bloqueia a renderização se o filtro de urgência estiver ativo e o evento não for urgente
-                if (filtroUltimosDiasAtivo && !isUltimosDias) {
-                    return;
-                }
+                // Bloqueia a renderização se um dos filtros de urgência estiver ativo e o evento não corresponder
+                if (filtroUltimosDiasAtivo && !isUltimosDias) return;
+                if (filtroEmBreveAtivo && !isEmBreve) return;
 
                 let periodoHTML = "";
                 if (ev.dtFim && ev.dtFim.iso !== ev.dtInic.iso) {
@@ -1733,17 +1763,18 @@
                     tagsHTML += `<span class="ev-tipo ${cat.classe}">${cat.nome}</span> `; 
                 });
                 
-                // Distintivo Visual (Badge) inserido direto no Título
-                let badgeUltimosDiasHTML = "";
+                // Distintivos Visuais Diferenciados (Badges)
+                let badgeHTML = "";
                 if (isUltimosDias) {
-                    badgeUltimosDiasHTML = `<span style="background: var(--accent-warning); color: #000; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">🚨 ÚLTIMOS DIAS</span>`;
+                    badgeHTML = `<span style="background: var(--accent-danger); color: #fff; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">🚨 ÚLTIMOS DIAS</span>`;
+                } else if (isEmBreve) {
+                    badgeHTML = `<span style="background: var(--accent-warning); color: #000; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">⏳ EM BREVE</span>`;
                 }
 
                 const classeBordaPrincipal = ev.categorias.length > 0 ? ev.categorias[0].classe : 'cat-default';
 
                 // GOOGLE CALENDAR
                 const dateStart = ev.dtInic.iso.replace(/-/g, '');
-                
                 let dateEndStr = ev.dtFim ? ev.dtFim.iso : ev.dtInic.iso;
                 let dateEndObj = new Date(dateEndStr);
                 dateEndObj.setDate(dateEndObj.getDate() + 1); 
@@ -1752,101 +1783,12 @@
                 const urlTitulo = encodeURIComponent(ev.titulo);
                 const urlDetalhe = encodeURIComponent(`Link: ${ev.link}\n\n${ev.desc}`);
                 const urlLocal = encodeURIComponent(ev.local);
-                
                 const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${urlTitulo}&dates=${dateStart}/${dateEnd}&details=${urlDetalhe}&location=${urlLocal}`;
 
                 htmlHTML += `
                     <div class="card datas-int ${classeBordaPrincipal}">
                         <div style="margin-bottom: 12px;">${tagsHTML}</div>
-                        <div class="ev-titulo">${ev.titulo} ${badgeUltimosDiasHTML}</div>
-                        <div class="ev-periodo">📅 ${periodoHTML}</div>
-                        ${ev.local ? `<div class="ev-local">📍 ${ev.local}</div>` : ''}
-                        ${ev.desc ? `<div class="ev-desc">${ev.desc}</div>` : ''}
-                        
-                        <div style="display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap;">
-                            ${ev.link ? `<a href="${ev.link}" target="_blank" class="btn btn-outline" style="font-size:0.8rem; padding:10px;">SAIBA MAIS</a>` : ''}
-                            <a href="${googleCalUrl}" target="_blank" class="btn btn-outline" style="border-color:#3b82f6; color:#3b82f6; font-size:0.8rem; padding:10px;">+ AGENDA</a>
-                        </div>
-                    </div>
-                `; 
-                datasExibidas++; function initDatas() { 
-            const container = document.getElementById('lista-datas'); 
-            let htmlHTML = ''; 
-            
-            if (baseDatas.length === 0) { 
-                container.innerHTML = "<p style='text-align:center; color:var(--text-muted);'>Nenhuma data cadastrada na base.</p>"; 
-                return; 
-            } 
-            
-            baseDatas.sort(function(a, b) { 
-                return new Date(a.dtInic.iso).getTime() - new Date(b.dtInic.iso).getTime(); 
-            });
-            
-            const hojeISO = toISODate(new Date()); 
-            const hojeObj = new Date();
-            hojeObj.setHours(0,0,0,0);
-            
-            let datasExibidas = 0; 
-            
-            baseDatas.forEach(function(ev) { 
-                // Filtro Cruzado de Categorias
-                const temCategoriaAtiva = filtrosCatAtivos.size === 0 || ev.categorias.some(function(cat) {
-                    return filtrosCatAtivos.has(cat.nome);
-                });
-                
-                if (!temCategoriaAtiva) return;
-                
-                if (filtrosUFAtivos.size > 0 && (!ev.uf || !filtrosUFAtivos.has(ev.uf))) return;
-
-                // Cálculo de Urgência
-                const dtFimObj = new Date(ev.dtFim.ano, ev.dtFim.mes - 1, ev.dtFim.dia);
-                const diffTime = dtFimObj.getTime() - hojeObj.getTime();
-                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-                const isUltimosDias = diffDays >= 0 && diffDays <= 7;
-
-                // Bloqueia a renderização se o filtro de urgência estiver ativo e o evento não for urgente
-                if (filtroUltimosDiasAtivo && !isUltimosDias) {
-                    return;
-                }
-
-                let periodoHTML = "";
-                if (ev.dtFim && ev.dtFim.iso !== ev.dtInic.iso) {
-                    periodoHTML = `De ${formatarDataBR(ev.dtInic.iso)} a ${formatarDataBR(ev.dtFim.iso)}/${ev.dtFim.ano}`;
-                } else {
-                    periodoHTML = `${formatarDataBR(ev.dtInic.iso)}/${ev.dtInic.ano}`;
-                }
-
-                let tagsHTML = ""; 
-                ev.categorias.forEach(function(cat) { 
-                    tagsHTML += `<span class="ev-tipo ${cat.classe}">${cat.nome}</span> `; 
-                });
-                
-                // Distintivo Visual (Badge) inserido direto no Título
-                let badgeUltimosDiasHTML = "";
-                if (isUltimosDias) {
-                    badgeUltimosDiasHTML = `<span style="background: var(--accent-warning); color: #000; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">🚨 ÚLTIMOS DIAS</span>`;
-                }
-
-                const classeBordaPrincipal = ev.categorias.length > 0 ? ev.categorias[0].classe : 'cat-default';
-
-                // GOOGLE CALENDAR
-                const dateStart = ev.dtInic.iso.replace(/-/g, '');
-                
-                let dateEndStr = ev.dtFim ? ev.dtFim.iso : ev.dtInic.iso;
-                let dateEndObj = new Date(dateEndStr);
-                dateEndObj.setDate(dateEndObj.getDate() + 1); 
-                const dateEnd = toISODate(dateEndObj).replace(/-/g, '');
-                
-                const urlTitulo = encodeURIComponent(ev.titulo);
-                const urlDetalhe = encodeURIComponent(`Link: ${ev.link}\n\n${ev.desc}`);
-                const urlLocal = encodeURIComponent(ev.local);
-                
-                const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${urlTitulo}&dates=${dateStart}/${dateEnd}&details=${urlDetalhe}&location=${urlLocal}`;
-
-                htmlHTML += `
-                    <div class="card datas-int ${classeBordaPrincipal}">
-                        <div style="margin-bottom: 12px;">${tagsHTML}</div>
-                        <div class="ev-titulo">${ev.titulo} ${badgeUltimosDiasHTML}</div>
+                        <div class="ev-titulo">${ev.titulo} ${badgeHTML}</div>
                         <div class="ev-periodo">📅 ${periodoHTML}</div>
                         ${ev.local ? `<div class="ev-local">📍 ${ev.local}</div>` : ''}
                         ${ev.desc ? `<div class="ev-desc">${ev.desc}</div>` : ''}
@@ -1858,13 +1800,6 @@
                     </div>
                 `; 
                 datasExibidas++; 
-            });
-            
-            if (datasExibidas === 0) { 
-                htmlHTML = "<p style='text-align:center; color:var(--text-muted);'>Nenhum evento encontrado com os filtros selecionados.</p>"; 
-            }
-            container.innerHTML = htmlHTML; 
-        }
             });
             
             if (datasExibidas === 0) { 
