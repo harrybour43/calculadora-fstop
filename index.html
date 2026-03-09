@@ -11,8 +11,8 @@
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-title" content="CLARA">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f4f4f5'%3E%3Cpath d='M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f4f4f5'%3E%3Cpath d='M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z'/%3E%3C/svg%3E">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -474,7 +474,7 @@
             right: 0;
             margin: 0 auto;
             max-width: 800px;
-            background: radial-gradient(circle at center, #2e1700 0%, #000000 70%);
+            background: radial-gradient(circle at center, #2e1700 0%, #0c0c0c 70%);
             z-index: 9999; 
             display: flex; 
             flex-direction: column; 
@@ -484,24 +484,16 @@
         }
         
         .app-icon-container {
-            width: 100px; 
-            height: 100px; 
-            background: var(--bg-panel); 
-            border-radius: 24px;
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 3.5rem;
-            box-shadow: 0 16px 40px rgba(255, 123, 0, 0.15); 
             margin-bottom: 24px;
-            animation: pulse-glow 2s infinite; 
-            border: 1px solid var(--border-color);
         }
         
-        @keyframes pulse-glow { 
-            0% { box-shadow: 0 0 0 0 rgba(255, 123, 0, 0.4); } 
-            70% { box-shadow: 0 0 0 20px rgba(255, 123, 0, 0); } 
-            100% { box-shadow: 0 0 0 0 rgba(255, 123, 0, 0); } 
+        .app-icon-container svg {
+            width: 80px; 
+            height: 80px; 
+            fill: var(--text-main);
         }
         
         @keyframes spin { 
@@ -599,7 +591,11 @@
 <body>
 
     <div id="splash-screen">
-        <div class="app-icon-container">🎓</div>
+        <div class="app-icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
+            </svg>
+        </div>
         <div class="brand-font" style="font-size: 3rem; margin-bottom: 8px; color: #fff;">CLARA</div>
         <div style="color: var(--accent-snc); font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-align: center; padding-inline: 20px;">
             Central de Luz e Apoio ao Repertório de Artistas do Audiovisual
@@ -611,7 +607,12 @@
     </div>
 
     <header class="app-header">
-        <div class="header-title">🎓 CLARA</div>
+        <div class="header-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
+            </svg>
+            CLARA
+        </div>
         <button id="btn-force-sync" class="sync-btn" onclick="forceSync()" title="Forçar Atualização">🔄</button>
     </header>
 
