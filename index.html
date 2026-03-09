@@ -93,7 +93,7 @@
         .header-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
         .sync-btn { background: var(--bg-elevated); border: 1px solid var(--border-color); color: var(--text-main); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; }
         .sync-btn:active { transform: scale(0.9); }
-        .sync-btn.spinning { animation: spin 1s linear infinite; opacity: 0.5; }
+        .sync-btn.spinning { animation: spin 1s linear inf; opacity: 0.5; }
 
         /* Títulos Grandes de Secão */
         .page-title { font-size: 2.2rem; margin-bottom: 24px; padding-bottom: 12px; }
@@ -212,7 +212,7 @@
             width: 100px; height: 100px; background: var(--bg-panel); border-radius: 24px;
             display: flex; justify-content: center; align-items: center; font-size: 3.5rem;
             box-shadow: 0 16px 40px rgba(255, 123, 0, 0.15); margin-bottom: 24px;
-            animation: pulse-glow 2s infinite; border: 1px solid var(--border-color);
+            animation: pulse-glow 2s inf; border: 1px solid var(--border-color);
         }
         @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(255, 123, 0, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(255, 123, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 123, 0, 0); } }
 
@@ -672,8 +672,16 @@
             linhas.forEach(c => { if (c.length >= 2 && c[0]) baseEventos.push({ data: c[0].trim(), titulo: c[1] ? c[1].trim() : '', desc: c[2] ? c[2].trim() : '' }); }); 
             const container = document.getElementById('lista-eventos'); let html = ''; 
             if (baseEventos.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted);'>Nenhum evento.</p>"; return; } 
-            baseEventos.sort((a, b) => new Date(processarDataInteligente(a.data).iso).getTime() - new Date(processarDataInteligente(b.data).iso).getTime());
-            const hojeLocal = new Date(); hojeLocal.setHours(0,0,0,0); 
+            
+            // CORREÇÃO: Trava de segurança que impede a quebra se a data for inválida
+            baseEventos.sort((a, b) => {
+                const dtA = processarDataInteligente(a.data); 
+                const dtB = processarDataInteligente(b.data);
+                if (!dtA || !dtB) return 0;
+                return new Date(dtA.iso).getTime() - new Date(dtB.iso).getTime();
+            });
+
+            const hojeLocal = new Date(); hojeLocal.setHours(0,0,0,0); let eventosExibidos = 0;
             baseEventos.forEach(ev => { 
                 const dt = processarDataInteligente(ev.data); if (!dt) return; 
                 const diffDays = Math.round((new Date(dt.ano, dt.mes - 1, dt.dia).getTime() - hojeLocal.getTime()) / (1000 * 60 * 60 * 24)); 
@@ -683,7 +691,11 @@
                             <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><span>${dt.dia.toString().padStart(2,'0')}/${dt.mes.toString().padStart(2,'0')}</span>${cdHTML}</div>
                             <div class="ev-titulo">${ev.titulo}</div><div class="ev-desc" style="margin-bottom:0;">${ev.desc}</div>
                         </div>`; 
-            }); container.innerHTML = html; 
+                eventosExibidos++;
+            }); 
+            
+            if (eventosExibidos === 0) { html = "<p style='text-align:center; color:var(--text-muted);'>Nenhum evento recente ou futuro.</p>"; }
+            container.innerHTML = html; 
         }
         document.getElementById('filtroUC').addEventListener('change', function(e) { 
             if (!e.target.value) return window.limparBusca(); 
