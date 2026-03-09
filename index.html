@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CLARA</title>
+    <title>CLARA v5.4.0</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-title" content="CLARA">
+    <meta name="apple-mobile-web-app-title" content="CLARA v5.4.0">
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f4f4f5'%3E%3Cpath d='M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f4f4f5'%3E%3Cpath d='M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z'/%3E%3C/svg%3E">
@@ -607,14 +607,14 @@
                 <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
             </svg>
         </div>
-        <div class="brand-font" style="font-size: 3rem; margin-bottom: 8px; color: #fff;">CLARA</div>
+        <div class="brand-font" style="font-size: 3rem; margin-bottom: 8px; color: #fff;">C.L.A.R.A.</div>
         <div style="color: var(--accent-snc); font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-align: center; padding-inline: 20px;">
             Central de Luz e Apoio ao Repertório de Artistas do Audiovisual
         </div>
         <div id="loading-text" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 32px;">Sincronizando bancos de dados...</div>
         
         <button id="btn-entrar" class="btn btn-primary hidden" style="margin-top: 32px; width: auto; padding: 16px 40px; border-radius: 99px; box-shadow: 0 4px 20px rgba(255, 123, 0, 0.3);" onclick="dismissSplash()">ENTRAR NO APP</button>
-        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">V5.3.0 • Harry Bour • 2026</div>
+        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">V5.4.0 • Harry Bour • 2026</div>
     </div>
 
     <header class="app-header">
@@ -1816,7 +1816,8 @@
                 const defSafe = item.definicao.replace(/'/g, "\\'").replace(/\n/g, '\\n');
                 
                 htmlHTML += `<div class="card dicio-item" onclick="abrirVerbeteModal('${termoSafe}', '${catSafe}', '${defSafe}')">
-                            <div class="term">${item.termo}</div>
+                            <div class="term" style="margin-bottom: 2px;">${item.termo}</div>
+                            <div style="font-size: 0.75rem; color: var(--accent-dicio); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">${item.categoria}</div>
                             <div class="preview">${item.definicao}</div>
                          </div>`;
             });
@@ -1846,7 +1847,8 @@
                 const defSafe = item.definicao.replace(/'/g, "\\'").replace(/\n/g, '\\n');
                 
                 htmlHTML += `<div class="card dicio-item" onclick="abrirVerbeteModal('${termoSafe}', '${catSafe}', '${defSafe}')">
-                            <div class="term">${item.termo}</div>
+                            <div class="term" style="margin-bottom: 2px;">${item.termo}</div>
+                            <div style="font-size: 0.75rem; color: var(--accent-dicio); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px;">${item.categoria}</div>
                             <div class="preview">${item.definicao}</div>
                          </div>`;
             });
