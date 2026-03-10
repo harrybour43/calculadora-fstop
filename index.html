@@ -1,9 +1,15 @@
+// Projeto: C.L.A.R.A.
+// Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual. Uma ferramenta PWA para fotógrafos e cinegrafistas com calculadoras de estúdio, radar cultural, enciclopédia e monitoramento de luz natural.
+// Versão: 5.7.2
+// Mudanças da Versão: Correção de contraste e UX nos botões de paginação do Cronograma de Aulas.
+// Data da Versão: 09/03/2026 - 21:57
+// Desenvolvedor: Harry Bour
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CLARA v5.8.0</title>
+    <title>CLARA</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -630,7 +636,7 @@
         <div id="loading-text" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 32px;">Sincronizando bancos de dados...</div>
         
         <button id="btn-entrar" class="btn btn-primary hidden" style="margin-top: 32px; width: auto; padding: 16px 40px; border-radius: 99px; box-shadow: 0 4px 20px rgba(255, 123, 0, 0.3);" onclick="dismissSplash()">ENTRAR NO APP</button>
-        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v5.8.0 • Harry Bour • 2026</div>
+        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v5.8.1 • Harry Bour • 2026</div>
     </div>
 
     <header class="app-header">
@@ -817,7 +823,7 @@
             
             <div style="display: flex; gap: 8px; margin-top: 16px;">
                 <button class="btn btn-outline" style="padding: 12px 8px; font-size: 0.85rem;" id="btn-passada" onclick="mudarSemana(-1)">Semana Passada</button>
-                <button class="btn btn-primary" style="padding: 12px 8px; font-size: 0.85rem; background: var(--accent-aulas);" id="btn-atual" onclick="mudarSemana(0)">Esta Semana</button>
+                <button class="btn btn-outline" style="padding: 12px 8px; font-size: 0.85rem;" id="btn-atual" onclick="mudarSemana(0)">Esta Semana</button>
                 <button class="btn btn-outline" style="padding: 12px 8px; font-size: 0.85rem;" id="btn-que-vem" onclick="mudarSemana(1)">Próxima</button>
             </div>
         </div>
@@ -1355,24 +1361,32 @@
             document.getElementById('painel-aulas').style.display = 'flex'; 
         }
 
+       // Alteração gerada em: 09/03/2026 - 21:57
         function mudarSemana(offset) { 
             const btnPassada = document.getElementById('btn-passada');
             const btnAtual = document.getElementById('btn-atual');
             const btnQueVem = document.getElementById('btn-que-vem');
             
-            // Controle visual dos botões
+            // Cores temáticas para cada estado
+            const corPassada = 'var(--text-muted)';
+            const corAtual = 'var(--accent-aulas)';
+            const corQueVem = 'var(--accent-datas)';
+
+            // 1. Reset Geral: Todos ficam com fundo transparente e borda colorida
+            btnPassada.style.cssText = `padding: 12px 8px; font-size: 0.85rem; background: transparent; color: ${corPassada}; border-color: ${corPassada};`;
+            btnAtual.style.cssText = `padding: 12px 8px; font-size: 0.85rem; background: transparent; color: ${corAtual}; border-color: ${corAtual};`;
+            btnQueVem.style.cssText = `padding: 12px 8px; font-size: 0.85rem; background: transparent; color: ${corQueVem}; border-color: ${corQueVem};`;
+
+            // 2. Aplica o fundo preenchido apenas ao botão ativo
             if (offset === -1) {
-                btnPassada.classList.add('btn-primary'); btnPassada.classList.remove('btn-outline');
-                btnAtual.classList.remove('btn-primary'); btnAtual.classList.add('btn-outline');
-                btnQueVem.classList.remove('btn-primary'); btnQueVem.classList.add('btn-outline');
+                btnPassada.style.background = corPassada;
+                btnPassada.style.color = '#fff'; 
             } else if (offset === 0) {
-                btnPassada.classList.remove('btn-primary'); btnPassada.classList.add('btn-outline');
-                btnAtual.classList.add('btn-primary'); btnAtual.classList.remove('btn-outline');
-                btnQueVem.classList.remove('btn-primary'); btnQueVem.classList.add('btn-outline');
+                btnAtual.style.background = corAtual;
+                btnAtual.style.color = '#fff';
             } else if (offset === 1) {
-                btnPassada.classList.remove('btn-primary'); btnPassada.classList.add('btn-outline');
-                btnAtual.classList.remove('btn-primary'); btnAtual.classList.add('btn-outline');
-                btnQueVem.classList.add('btn-primary'); btnQueVem.classList.remove('btn-outline');
+                btnQueVem.style.background = corQueVem;
+                btnQueVem.style.color = '#121212'; // Contraste escuro para o ciano
             }
             
             const hoje = new Date(); 
