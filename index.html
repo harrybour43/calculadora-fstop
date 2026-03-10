@@ -657,7 +657,7 @@
         <div id="loading-text" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 32px;">Sincronizando bancos de dados...</div>
         
         <button id="btn-entrar" class="btn btn-primary hidden" style="margin-top: 32px; width: auto; padding: 16px 40px; border-radius: 99px; box-shadow: 0 4px 20px rgba(255, 123, 0, 0.3);" onclick="dismissSplash()">ENTRAR NO APP</button>
-        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v6.1.0 • Harry Bour • 2026</div>
+        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v6.2.0 • Harry Bour • 2026</div>
     </div>
 
     <header class="app-header">
@@ -979,7 +979,7 @@
     <script>
         // Projeto: C.L.A.R.A.
         // Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual.
-        // Versão: 5.9.3
+        // Versão: 6.2.0
         // Mudanças da Versão: Unificação de menus no topo à direita, cabeçalho alinhado à esquerda, automação diurna/noturna na Luz Natural e filtros de localidade colapsáveis.
         // Data da Versão: 10/03/2026 - 00:08
         // Desenvolvedor: Harry Bour 
@@ -2936,6 +2936,58 @@
                 // Falha silenciosa ignorada no console para não sujar o debug
             }
         }
+
+        // Alteração gerada em: 10/03/2026 - 11:15
+        // ==========================================
+        // MOTOR PWA (INSTALAÇÃO DO APP)
+        // ==========================================
+        let deferredPrompt;
+        
+        // Ouve o sinal nativo de "PWA pronto para instalar" do navegador
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Impede o aviso padrão (chatito) do Chrome de aparecer sozinho
+            e.preventDefault();
+            // Guarda o evento para dispararmos apenas quando o usuário clicar no botão
+            deferredPrompt = e;
+            
+            // Garante que o botão fique visível se o app ainda não estiver instalado
+            const installBtn = document.getElementById('btn-install-pwa');
+            const installedMsg = document.getElementById('pwa-installed-msg');
+            if(installBtn) installBtn.style.display = 'inline-flex';
+            if(installedMsg) installedMsg.classList.add('hidden');
+        });
+
+        // Conecta o clique do botão ao instalador nativo
+        document.addEventListener('DOMContentLoaded', () => {
+            const installBtn = document.getElementById('btn-install-pwa');
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        // Dispara a janela de instalação do Android/iOS
+                        deferredPrompt.prompt();
+                        // Aguarda o usuário clicar em "Instalar" ou "Cancelar"
+                        const { outcome } = await deferredPrompt.userChoice;
+                        // Anula o prompt para não ser usado duas vezes
+                        deferredPrompt = null;
+                    } else {
+                        // Failsafe para iOS ou navegadores que não suportam o botão nativo
+                        alert("Para instalar no iOS: toque no botão de 'Compartilhar' (quadrado com seta para cima) e depois em 'Adicionar à Tela de Início'.");
+                    }
+                });
+            }
+        });
+
+        // Ouve quando a instalação é concluída com sucesso
+        window.addEventListener('appinstalled', () => {
+            const installBtn = document.getElementById('btn-install-pwa');
+            const installedMsg = document.getElementById('pwa-installed-msg');
+            
+            // Esconde o botão e mostra o check verde no menu
+            if(installBtn) installBtn.style.display = 'none';
+            if(installedMsg) installedMsg.classList.remove('hidden');
+            
+            deferredPrompt = null;
+        });
 
         // ==========================================
         // SISTEMA DE PROTEÇÃO (ANTI-INSPECT / ANTI-COPY)
