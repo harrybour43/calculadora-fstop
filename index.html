@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CLARA v5.7.0</title>
+    <title>CLARA v5.8.0</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -630,7 +630,7 @@
         <div id="loading-text" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 32px;">Sincronizando bancos de dados...</div>
         
         <button id="btn-entrar" class="btn btn-primary hidden" style="margin-top: 32px; width: auto; padding: 16px 40px; border-radius: 99px; box-shadow: 0 4px 20px rgba(255, 123, 0, 0.3);" onclick="dismissSplash()">ENTRAR NO APP</button>
-        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v5.7.0 • Harry Bour • 2026</div>
+        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v5.8.0 • Harry Bour • 2026</div>
     </div>
 
     <header class="app-header">
@@ -903,6 +903,7 @@
         let filtrosUFAtivos = new Set();
         let filtroUltimosDiasAtivo = false; 
         let filtroEmBreveAtivo = false; // Adicionamos o controle do "Em Breve"
+        let filtroEmAndamentoAtivo = false; // NOVO: Controle do "Em Andamento"
 
         const nomesUC = { 
             "UC1": "Captar imagens", 
@@ -1619,6 +1620,7 @@
             let setUF = new Set(); 
             let temUltimosDias = false; 
             let temEmBreve = false;
+            let temEmAndamento = false;
             
             const hojeObj = new Date();
             hojeObj.setHours(0,0,0,0);
@@ -1635,13 +1637,17 @@
                 const diffInicDays = Math.round((dtInicObj - hojeTime) / (1000 * 60 * 60 * 24));
                 const diffFimDays = Math.round((dtFimObj - hojeTime) / (1000 * 60 * 60 * 24));
                 
-                // REGRA 1: Já começou (ou começa hoje) e termina em até 7 dias
+                // REGRA 1: Últimos dias
                 if (diffInicDays <= 0 && diffFimDays >= 0 && diffFimDays <= 7) {
                     temUltimosDias = true;
                 }
-                // REGRA 2: Ainda não começou, mas começa em até 7 dias
+                // REGRA 2: Em Breve
                 if (diffInicDays > 0 && diffInicDays <= 7) {
                     temEmBreve = true;
+                }
+                // REGRA 3: Em Andamento
+                if (diffInicDays <= 0 && diffFimDays >= 0) {
+                    temEmAndamento = true;
                 }
             });
 
@@ -1664,12 +1670,20 @@
             });
             boxUF.innerHTML = htmlUF;
 
-            // Renderiza os Botões de Urgência
+            // Renderiza os Botões de Urgência / Status
             if (boxUrgencia && tituloUrgencia) {
-                if (temUltimosDias || temEmBreve) {
+                if (temUltimosDias || temEmBreve || temEmAndamento) {
                     tituloUrgencia.style.display = 'block';
                     boxUrgencia.style.display = 'flex';
                     let chipsHTML = '';
+                    
+                    if (temEmAndamento) {
+                        let classAtivo = filtroEmAndamentoAtivo ? 'active' : '';
+                        let estiloExtra = filtroEmAndamentoAtivo 
+                            ? 'border-color: #10b981; background: #10b981; color: #fff;' 
+                            : 'border-color: #10b981; color: #10b981; background: transparent;';
+                        chipsHTML += `<div class="filter-chip ${classAtivo}" style="${estiloExtra}" onclick="toggleFiltroUrgencia('andamento')">▶️ EM ANDAMENTO</div>`;
+                    }
                     
                     if (temUltimosDias) {
                         let classAtivo = filtroUltimosDiasAtivo ? 'active' : '';
@@ -1693,6 +1707,7 @@
                     boxUrgencia.style.display = 'none';
                     filtroUltimosDiasAtivo = false;
                     filtroEmBreveAtivo = false;
+                    filtroEmAndamentoAtivo = false;
                 }
             }
         }
@@ -1728,10 +1743,16 @@
         function toggleFiltroUrgencia(tipo) {
             if (tipo === 'ultimos') {
                 filtroUltimosDiasAtivo = !filtroUltimosDiasAtivo;
-                filtroEmBreveAtivo = false; // Desmarca o outro
+                filtroEmBreveAtivo = false;
+                filtroEmAndamentoAtivo = false;
             } else if (tipo === 'breve') {
                 filtroEmBreveAtivo = !filtroEmBreveAtivo;
-                filtroUltimosDiasAtivo = false; // Desmarca o outro
+                filtroUltimosDiasAtivo = false;
+                filtroEmAndamentoAtivo = false;
+            } else if (tipo === 'andamento') {
+                filtroEmAndamentoAtivo = !filtroEmAndamentoAtivo;
+                filtroUltimosDiasAtivo = false;
+                filtroEmBreveAtivo = false;
             }
             renderFiltrosAgenda();
             initDatas();
@@ -1766,7 +1787,7 @@
                 if (!temCategoriaAtiva) return;
                 if (filtrosUFAtivos.size > 0 && (!ev.uf || !filtrosUFAtivos.has(ev.uf))) return;
 
-                // Cálculo de Urgência Matemática
+                // Cálculo de Urgência e Status
                 const dtInicObj = new Date(ev.dtInic.ano, ev.dtInic.mes - 1, ev.dtInic.dia).getTime();
                 const dtFimObj = new Date(ev.dtFim.ano, ev.dtFim.mes - 1, ev.dtFim.dia).getTime();
                 
@@ -1775,10 +1796,12 @@
                 
                 const isUltimosDias = diffInicDays <= 0 && diffFimDays >= 0 && diffFimDays <= 7;
                 const isEmBreve = diffInicDays > 0 && diffInicDays <= 7;
+                const isEmAndamento = diffInicDays <= 0 && diffFimDays >= 0;
 
-                // Bloqueia a renderização se um dos filtros de urgência estiver ativo e o evento não corresponder
+                // Bloqueia a renderização se um dos filtros de status estiver ativo e o evento não corresponder
                 if (filtroUltimosDiasAtivo && !isUltimosDias) return;
                 if (filtroEmBreveAtivo && !isEmBreve) return;
+                if (filtroEmAndamentoAtivo && !isEmAndamento) return;
 
                 let periodoHTML = "";
                 if (ev.dtFim && ev.dtFim.iso !== ev.dtInic.iso) {
@@ -1794,10 +1817,13 @@
                 
                 // Distintivos Visuais Diferenciados (Badges)
                 let badgeHTML = "";
+                // Prioridade de exibição: Últimos dias sobrepõe o Em Andamento
                 if (isUltimosDias) {
                     badgeHTML = `<span style="background: var(--accent-danger); color: #fff; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">🚨 ÚLTIMOS DIAS</span>`;
                 } else if (isEmBreve) {
                     badgeHTML = `<span style="background: var(--accent-warning); color: #000; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">⏳ EM BREVE</span>`;
+                } else if (isEmAndamento) {
+                    badgeHTML = `<span style="background: #10b981; color: #fff; font-size: 0.6rem; font-family: 'DM Sans', sans-serif; font-weight: 800; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; margin-left: 12px; vertical-align: middle;">▶️ EM ANDAMENTO</span>`;
                 }
 
                 const classeBordaPrincipal = ev.categorias.length > 0 ? ev.categorias[0].classe : 'cat-default';
