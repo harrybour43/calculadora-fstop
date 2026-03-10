@@ -530,6 +530,34 @@
         /* ==========================================
            7. MÓDULOS ESPECÍFICOS E CHIPS
            ========================================== */
+
+        /* Alteração gerada em: 09/03/2026 - 23:45 */
+        /* Menu Lateral e Filtros */
+        .side-menu {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100dvh;
+            background: var(--bg-panel); z-index: 4000; transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid var(--border-color); padding: calc(20px + var(--sat)) 20px 20px;
+        }
+        .side-menu.active { transform: translateX(0); }
+
+        .filter-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px; background: var(--bg-elevated); border-radius: 12px
+            ;
+            cursor: pointer; border: 1px solid var(--border-color);
+        }
+        .filter-body { 
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;
+        }
+        .filter-body.expanded { max-height: 1000px; padding-top: 12px; }
+
+        .btn-add-inline {
+            background: var(--bg-elevated); border: 1px solid var(--border-color);
+            color: var(--accent-datas); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer;
+        }
+        
         .filter-container { background: var(--bg-panel); padding: 16px; border-radius: 16px; margin-bottom: 24px; border: 1px solid var(--border-color); }
         .filter-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; display: block; text-transform: uppercase; letter-spacing: 0.5px;}
         .filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
@@ -634,33 +662,51 @@
     </div>
 
     <header class="app-header">
-        <div class="header-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
-            </svg>
-            CLARA
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="sync-btn" onclick="toggleMenu()" style="border:none; background:transparent; font-size: 1.5rem;">☰</button>
+            <div class="header-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
+                </svg>
+                CLARA
+            </div>
         </div>
-        <button id="btn-force-sync" class="sync-btn" onclick="forceSync()" title="Forçar Atualização">🔄</button>
+        <button class="sync-btn" onclick="openPush('push-settings')" title="Configurações">⚙️</button>
     </header>
+
+    <nav id="side-menu" class="side-menu">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 30px;">
+            <span class="brand-font" style="font-size: 1.8rem; color: #fff;">Menu</span>
+            <button onclick="toggleMenu()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.2rem; cursor: pointer;">✕</button>
+        </div>
+        <button class="btn btn-primary" onclick="forceSync(); toggleMenu();" style="background: var(--bg-elevated); color: #fff; margin-bottom: 16px;">🔄 Forçar Sincronia</button>
+        </nav>
 
     <main class="app-viewport">
         
         <section id="view-datas" class="view-tab active">
-            <h1 class="page-title" style="color: var(--accent-datas);">Radar Cultural</h1>
-            
-            <button class="btn btn-outline" style="margin-bottom: 24px;" onclick="openPush('push-contribuir')">
-                <span>➕</span> Sugerir novo evento
-            </button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h1 class="page-title" style="color: var(--accent-datas); margin-bottom: 0; padding-bottom: 0;">Radar Cultural</h1>
+                <button class="btn-add-inline" onclick="openPush('push-contribuir')" title="Sugerir Evento">+</button>
+            </div>
 
-            <div class="filter-container" id="painel-filtros" style="display: none;">
-                <span class="filter-title">Categorias</span>
-                <div class="filter-row" id="filtros-categoria"></div>
-                
-                <span class="filter-title" style="margin-top: 16px;">Estado (UF)</span>
-                <div class="filter-row" id="filtros-uf"></div>
-                
-                <span class="filter-title" id="titulo-filtro-urgencia" style="margin-top: 16px; display: none; color: var(--accent-warning);">NÃO PERCA!</span>
-                <div class="filter-row" id="filtros-urgencia" style="display: none;"></div>
+            <div id="painel-filtros-container" class="card" style="padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none; margin-bottom: 16px;">
+                <div class="filter-header" onclick="toggleFiltros()">
+                    <span style="font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px; color: var(--text-main);">🔍 FILTROS</span>
+                    <span id="filter-chevron" style="color: var(--text-muted); font-size: 0.8rem;">▼</span>
+                </div>
+                <div id="filter-body" class="filter-body">
+                    <div class="filter-container" id="painel-filtros" style="display: none; border: none; margin-bottom: 0; padding: 0;">
+                        <span class="filter-title">Categorias</span>
+                        <div class="filter-row" id="filtros-categoria"></div>
+                        
+                        <span class="filter-title" style="margin-top: 16px;">Estado (UF)</span>
+                        <div class="filter-row" id="filtros-uf"></div>
+                        
+                        <span class="filter-title" id="titulo-filtro-urgencia" style="margin-top: 16px; display: none; color: var(--accent-warning);">STATUS</span>
+                        <div class="filter-row" id="filtros-urgencia" style="display: none;"></div>
+                    </div>
+                </div>
             </div>
 
             <div id="lista-datas">
@@ -833,6 +879,40 @@
         </div>
     </aside>
 
+    <aside id="push-settings" class="push-screen">
+        <header class="push-header">
+            <button class="btn-back" onclick="closePush('push-settings')">‹ Voltar</button>
+            <div class="push-title">Configurações</div>
+        </header>
+        <div class="push-content">
+            <h3 class="brand-font" style="font-size: 1.8rem; margin-bottom: 20px; color: #fff;">Notificações</h3>
+            
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 16px;">
+                <div>
+                    <div style="font-weight: 700; color: #fff;">Alertas do Radar</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Eventos em 'Últimos Dias'</div>
+                </div>
+                <input type="checkbox" id="notify-radar" style="width: 24px; height: 24px; accent-color: var(--accent-snc);">
+            </div>
+
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 16px;">
+                <div>
+                    <div style="font-weight: 700; color: #fff;">Ciclo Solar</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Início da Hora Dourada</div>
+                </div>
+                <input type="checkbox" id="notify-sun" style="width: 24px; height: 24px; accent-color: var(--accent-snc);">
+            </div>
+
+            <button class="btn btn-primary" onclick="solicitarPermissaoNotificacao()" style="margin-top: 20px;">
+                ATIVAR NOTIFICAÇÕES (PWA)
+            </button>
+            
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 24px; text-align: center; line-height: 1.5;">
+                Nota: O envio de notificações requer que o app esteja instalado na tela inicial do seu dispositivo.
+            </p>
+        </div>
+    </aside>
+
     <div class="bottom-sheet-backdrop" id="sheet-backdrop" onclick="closeBottomSheet()"></div>
     <div class="bottom-sheet" id="bottom-sheet">
         <div class="sheet-handle"></div>
@@ -883,12 +963,12 @@
     <div id="visitor-counter" style="color: var(--bg-color); position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; max-width: 800px; font-size: 0.1rem; user-select: all; opacity: 0; pointer-events: none;">0</div>
 
     <script>
-        //Projeto: C.L.A.R.A.
-        // Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual. Uma ferramenta PWA para fotógrafos e cinegrafistas com calculadoras de estúdio, radar cultural, enciclopédia e monitoramento de luz natural.
-        // Versão: 5.7.2
-        // Mudanças da Versão: Correção de contraste e UX nos botões de paginação do Cronograma de Aulas.
-        // Data da Versão: 09/03/2026 - 21:57
-        // Desenvolvedor: Harry Bour
+        // Projeto: C.L.A.R.A.
+        // Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual. Uma ferramenta PWA para fotógrafos e cinegrafistas.
+        // Versão: 5.9.1
+        // Mudanças da Versão: Redesign do Radar Cultural (filtros colapsáveis, botão '+'), adição do Menu Lateral (Sanduíche) e tela de Configurações/Notificações.
+        // Data da Versão: 09/03/2026 - 23:45
+        // Desenvolvedor: Harry Bour 
         
         // ==========================================
         // VARIÁVEIS GLOBAIS E LINKS DAS PLANILHAS
@@ -975,9 +1055,11 @@
             document.getElementById('bottom-sheet').classList.add('active');
         }
 
+        // Alteração gerada em: 09/03/2026 - 23:45
         function closeBottomSheet() {
             document.getElementById('sheet-backdrop').classList.remove('active');
             document.getElementById('bottom-sheet').classList.remove('active');
+            document.getElementById('side-menu').classList.remove('active'); // Garante que feche o menu também
         }
 
         function abrirModal(dataISO, ucNome, profNome, numAula) { 
@@ -2744,6 +2826,39 @@
                 
                 resDiv.innerHTML = resultHTML; 
             }); 
+        }
+
+        // Alteração gerada em: 09/03/2026 - 23:45
+        // ==========================================
+        // MOTOR DE INTERFACE E NOTIFICAÇÕES
+        // ==========================================
+        function toggleMenu() {
+            document.getElementById('side-menu').classList.toggle('active');
+            document.getElementById('sheet-backdrop').classList.toggle('active');
+        }
+
+        function toggleFiltros() {
+            const body = document.getElementById('filter-body');
+            const chevron = document.getElementById('filter-chevron');
+            body.classList.toggle('expanded');
+            chevron.innerText = body.classList.contains('expanded') ? '▲' : '▼';
+        }
+
+        async function solicitarPermissaoNotificacao() {
+            if (!("Notification" in window)) {
+                alert("Este navegador não suporta notificações.");
+                return;
+            }
+
+            const permissao = await Notification.requestPermission();
+            if (permissao === "granted") {
+                new Notification("C.L.A.R.A. Ativada!", {
+                    body: "Permissão concedida. Você receberá alertas sobre luz e eventos.",
+                    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff7b00'%3E%3Cpath d='M12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z'/%3E%3C/svg%3E"
+                });
+            } else {
+                alert("Para receber alertas, você precisa autorizar as notificações nas configurações do seu celular ou navegador.");
+            }
         }
 
         // ==========================================
