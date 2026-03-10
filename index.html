@@ -105,25 +105,23 @@
            2. LAYOUT APP NATIVO (Header, Viewport, TabBar)
            ========================================== */
         
+        /* Alteração gerada em: 10/03/2026 - 00:08 */
         .app-header {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            margin: 0 auto;
-            width: 100%;
-            max-width: 800px;
-            height: calc(60px + var(--sat)); 
-            padding-top: var(--sat);
-            background: rgba(12, 12, 12, 0.85);
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between;
-            padding-inline: 20px; 
-            z-index: 1000; 
-            border-bottom: 1px solid var(--border-color);
+            position: fixed; top: 0; left: 0; right: 0; margin: 0 auto;
+            width: 100%; max-width: 800px; height: calc(60px + var(--sat)); 
+            padding-top: var(--sat); background: rgba(12, 12, 12, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding-inline: 20px; z-index: 1000; border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Menu fixado à direita mas abrindo da esquerda para direita */
+        .side-menu {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100dvh;
+            background: var(--bg-panel); z-index: 4000; transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid var(--border-color); padding: calc(20px + var(--sat)) 20px 20px;
+            display: flex; flex-direction: column;
         }
         
         .header-title { 
@@ -659,20 +657,17 @@
         <div id="loading-text" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 32px;">Sincronizando bancos de dados...</div>
         
         <button id="btn-entrar" class="btn btn-primary hidden" style="margin-top: 32px; width: auto; padding: 16px 40px; border-radius: 99px; box-shadow: 0 4px 20px rgba(255, 123, 0, 0.3);" onclick="dismissSplash()">ENTRAR NO APP</button>
-        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v6.0.1 • Harry Bour • 2026</div>
+        <div style="position: absolute; bottom: 40px; font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">v6.1.0 • Harry Bour • 2026</div>
     </div>
 
     <header class="app-header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="sync-btn" onclick="toggleMenu()" style="border:none; background:transparent; font-size: 1.5rem;">☰</button>
-            <div class="header-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
-                </svg>
-                CLARA
-            </div>
+        <div class="header-title" style="gap: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 6C2.9 6 2 6.9 2 8V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H16.83L15 4H9L7.17 6H4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z"/>
+            </svg>
+            <span class="brand-font" style="font-size: 1.6rem; letter-spacing: 1px;">CLARA</span>
         </div>
-        <button class="sync-btn" onclick="openPush('push-settings')" title="Configurações">⚙️</button>
+        <button class="sync-btn" onclick="toggleMenu()" style="border:none; background:transparent; font-size: 1.6rem;">☰</button>
     </header>
 
     <nav id="side-menu" class="side-menu">
@@ -680,8 +675,18 @@
             <span class="brand-font" style="font-size: 1.8rem; color: #fff;">Menu</span>
             <button onclick="toggleMenu()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.2rem; cursor: pointer;">✕</button>
         </div>
-        <button class="btn btn-primary" onclick="forceSync(); toggleMenu();" style="background: var(--bg-elevated); color: #fff; margin-bottom: 16px;">🔄 Forçar Sincronia</button>
-        </nav>
+        
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn btn-primary" onclick="forceSync();" style="background: var(--bg-elevated); color: #fff; justify-content: flex-start;">🔄 Sincronizar Dados</button>
+            
+            <button class="btn btn-primary" onclick="toggleMenu(); openPush('push-settings');" style="background: var(--bg-elevated); color: #fff; justify-content: flex-start;">⚙️ Notificações</button>
+        </div>
+
+        <div id="pwa-install-footer" style="padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center;">
+            <button id="btn-install-pwa" class="btn btn-outline" style="font-size: 0.8rem; border-color: var(--accent-snc); color: var(--accent-snc);">📥 Baixar Aplicativo CLARA</button>
+            <p id="pwa-installed-msg" class="hidden" style="font-size: 0.7rem; color: var(--accent-aulas); font-weight: 700;">✅ App instalado e pronto para uso offline.</p>
+        </div>
+    </nav>
 
     <main class="app-viewport">
         
@@ -738,16 +743,24 @@
         <section id="view-suncalc" class="view-tab">
             <h1 class="page-title" style="color: var(--accent-sun);">Luz Natural</h1>
             
-            <div class="card" style="border-top-color: var(--accent-sun); border-top-width: 4px;">
-                <label style="display:block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">LOCALIDADE DO ENSAIO</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    <input type="text" id="buscaLocalSunCalc" class="input-box" placeholder="Ex: Ubatuba, SP...">
-                    <button class="btn btn-primary" style="width: auto; background: var(--accent-sun); color: #000;" id="btn-buscar-local" onclick="buscarLocalidadeSunCalc()">Buscar</button>
+            <div id="sun-filters-container" class="card" style="padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none; margin-bottom: 16px;">
+                <div class="filter-header" onclick="toggleFiltrosLocal()">
+                    <span style="font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px; color: var(--text-main);">📍 LOCAL E DATA</span>
+                    <span id="sun-filter-chevron" style="color: var(--text-muted); font-size: 0.8rem;">▼</span>
                 </div>
-                <button class="btn btn-outline" style="border-color: var(--accent-sun); color: var(--accent-sun); margin-bottom: 20px;" id="btn-gps" onclick="getMyLocation()">📍 Usar meu GPS atual</button>
-                
-                <label style="display:block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">DATA DO ENSAIO</label>
-                <input type="date" id="dataSunCalc" class="input-box" onchange="atualizarDataSunCalc()" style="color-scheme: dark;">
+                <div id="sun-filter-body" class="filter-body">
+                    <div class="card" style="border-top-color: var(--accent-sun); border-top-width: 4px; margin-top: 12px;">
+                        <label style="display:block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">LOCALIDADE DO ENSAIO</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <input type="text" id="buscaLocalSunCalc" class="input-box" placeholder="Ex: Ubatuba, SP...">
+                            <button class="btn btn-primary" style="width: auto; background: var(--accent-sun); color: #000;" onclick="buscarLocalidadeSunCalc()">Buscar</button>
+                        </div>
+                        <button class="btn btn-outline" style="border-color: var(--accent-sun); color: var(--accent-sun); margin-bottom: 20px;" onclick="getMyLocation()">📍 Usar meu GPS atual</button>
+                        
+                        <label style="display:block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">DATA DO ENSAIO</label>
+                        <input type="date" id="dataSunCalc" class="input-box" onchange="atualizarDataSunCalc()" style="color-scheme: dark;">
+                    </div>
+                </div>
             </div>
             
             <div id="local-ref-title" style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;"></div>
@@ -965,10 +978,10 @@
 
     <script>
         // Projeto: C.L.A.R.A.
-        // Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual. Uma ferramenta PWA para fotógrafos e cinegrafistas.
-        // Versão: 5.9.1
-        // Mudanças da Versão: Redesign do Radar Cultural (filtros colapsáveis, botão '+'), adição do Menu Lateral (Sanduíche) e tela de Configurações/Notificações.
-        // Data da Versão: 09/03/2026 - 23:45
+        // Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual.
+        // Versão: 5.9.3
+        // Mudanças da Versão: Unificação de menus no topo à direita, cabeçalho alinhado à esquerda, automação diurna/noturna na Luz Natural e filtros de localidade colapsáveis.
+        // Data da Versão: 10/03/2026 - 00:08
         // Desenvolvedor: Harry Bour 
         
         // ==========================================
@@ -1186,9 +1199,33 @@
             }, 500);
         }
 
-        function forceSync() {
-            document.getElementById('btn-force-sync').classList.add('spinning');
-            fetchGoogleSheets();
+        // Alteração gerada em: 10/03/2026 - 00:15
+        async function forceSync() {
+            const btn = document.getElementById('btn-install-pwa'); // Referência ao botão no menu
+            // Se o botão de força sync for o do header ou o do menu:
+            const btnMenu = document.querySelector('button[onclick*="forceSync"]');
+            
+            const textoOriginal = btnMenu.innerHTML;
+            btnMenu.innerHTML = "⏳ Sincronizando...";
+            btnMenu.style.opacity = "0.7";
+            btnMenu.disabled = true;
+
+            // Dispara a busca real das planilhas
+            await fetchGoogleSheets();
+
+            // Pequeno delay para o usuário conseguir ler o estado final
+            setTimeout(() => {
+                btnMenu.innerHTML = "✅ Versão Atualizada!";
+                btnMenu.style.color = "var(--accent-aulas)";
+                
+                // Retorna ao estado normal após 3 segundos
+                setTimeout(() => {
+                    btnMenu.innerHTML = textoOriginal;
+                    btnMenu.style.opacity = "1";
+                    btnMenu.style.color = "#fff";
+                    btnMenu.disabled = false;
+                }, 3000);
+            }, 1000);
         }
 
         // FETCH BLINDADO: Garante que o botão Entrar sempre aparecerá
@@ -2449,6 +2486,7 @@
             `;
         }
         
+        // Alteração gerada em: 10/03/2026 - 10:50
         function initSunCalc() { 
             const hoje = new Date(); 
             const dataInput = document.getElementById('dataSunCalc'); 
@@ -2456,9 +2494,27 @@
                 dataInput.value = toISODate(hoje); 
             } 
             renderSunCalc(hoje); 
+            autoSwitchSunTab(); // <-- AGORA SIM ELA ESTÁ SENDO EXECUTADA AQUI DENTRO!
+        }
+
+        function autoSwitchSunTab() {
+            const hora = new Date().getHours();
+            // Se for entre 18h e 5h, abre em Astros e Lua
+            if (hora >= 18 || hora <= 5) {
+                switchLuzTab('noturna');
+            } else {
+                switchLuzTab('diurna');
+            }
+        }
+
+        function toggleFiltrosLocal() {
+            const body = document.getElementById('sun-filter-body');
+            const chevron = document.getElementById('sun-filter-chevron');
+            body.classList.toggle('expanded');
+            chevron.innerText = body.classList.contains('expanded') ? '▲' : '▼';
         }
         
-        function atualizarDataSunCalc() { 
+            function atualizarDataSunCalc() { 
             const dataString = document.getElementById('dataSunCalc').value; 
             if(!dataString) { return; }
             const partes = dataString.split('-'); 
