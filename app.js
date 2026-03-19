@@ -1,8 +1,8 @@
 // Projeto: C.L.A.R.A.
 // Descrição: Central de Luz e Apoio ao Repertório de Artistas do Audiovisual.
-// Versão: 6.5.0
-// Mudanças da Versão: Inclusão de Calculadora de Sistema de Zonas
-// Data da Versão: 16/03/2026 - 15:45
+// Versão: 6.6.0
+// Mudanças da Versão: Inclusão de Filtro ND na Calculadora de Sistema de Zonas 
+// Data da Versão: 19/03/2026 - 14:25
 // Desenvolvedor: Harry Bour
 
 // ==========================================
@@ -16,7 +16,7 @@ const LINK_PLANILHA_DATAS =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=2069138341&single=true&output=tsv";
 const LINK_PLANILHA_DICIO =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqOEEEZGFugY9MN7_0OsVjxvl02CxltDPfTx3LbUtte0mY7nLHWJxmu-ISbymcrS7cbyK__ixm43fI/pub?gid=1758081988&single=true&output=tsv";
-const APP_VERSION = "6.3.0"; // ÚNICO LUGAR PARA MUDAR A VERSÃO NO FUTURO!
+const APP_VERSION = "6.6.0"; // ÚNICO LUGAR PARA MUDAR A VERSÃO NO FUTURO!
 let aulasArray = [];
 let baseEventos = [];
 let baseDatas = [];
@@ -153,6 +153,22 @@ function abrirGuiaLuz() {
     document.getElementById("guia-luz-content").innerHTML,
     "var(--accent-calc)"
   );
+}
+
+function abrirGuiaZonas() {
+  openBottomSheet(
+    "SISTEMA DE ZONAS",
+    "Fotometria e Filtros",
+    document.getElementById("guia-zonas-content").innerHTML,
+    "var(--accent-zonas)"
+  );
+}
+
+function toggleZonasBox(bodyId, chevId) {
+  const body = document.getElementById(bodyId);
+  const chev = document.getElementById(chevId);
+  body.classList.toggle("expanded");
+  chev.innerText = body.classList.contains("expanded") ? "▲" : "▼";
 }
 
 // ==========================================
@@ -2363,24 +2379,61 @@ window.addEventListener("appinstalled", () => {
 // ==========================================
 
 const stdZonasSpeeds = [
-    { s: "1/8000", t: 1/8000 }, { s: "1/6400", t: 1/6400 }, { s: "1/5000", t: 1/5000 },
-    { s: "1/4000", t: 1/4000 }, { s: "1/3200", t: 1/3200 }, { s: "1/2500", t: 1/2500 },
-    { s: "1/2000", t: 1/2000 }, { s: "1/1600", t: 1/1600 }, { s: "1/1250", t: 1/1250 },
-    { s: "1/1000", t: 1/1000 }, { s: "1/800", t: 1/800 }, { s: "1/640", t: 1/640 },
-    { s: "1/500", t: 1/500 }, { s: "1/400", t: 1/400 }, { s: "1/320", t: 1/320 },
-    { s: "1/250", t: 1/250 }, { s: "1/200", t: 1/200 }, { s: "1/160", t: 1/160 },
-    { s: "1/125", t: 1/125 }, { s: "1/100", t: 1/100 }, { s: "1/80", t: 1/80 },
-    { s: "1/60", t: 1/60 }, { s: "1/50", t: 1/50 }, { s: "1/40", t: 1/40 },
-    { s: "1/30", t: 1/30 }, { s: "1/25", t: 1/25 }, { s: "1/20", t: 1/20 },
-    { s: "1/15", t: 1/15 }, { s: "1/13", t: 1/13 }, { s: "1/10", t: 1/10 },
-    { s: "1/8", t: 1/8 }, { s: "1/6", t: 1/6 }, { s: "1/5", t: 1/5 },
-    { s: "1/4", t: 1/4 }, { s: "0.3s", t: 0.3 }, { s: "0.4s", t: 0.4 },
-    { s: "0.5s", t: 0.5 }, { s: "0.6s", t: 0.6 }, { s: "0.8s", t: 0.8 },
-    { s: "1s", t: 1 }, { s: "1.3s", t: 1.3 }, { s: "1.6s", t: 1.6 },
-    { s: "2s", t: 2 }, { s: "2.5s", t: 2.5 }, { s: "3.2s", t: 3.2 },
-    { s: "4s", t: 4 }, { s: "5s", t: 5 }, { s: "6s", t: 6 },
-    { s: "8s", t: 8 }, { s: "10s", t: 10 }, { s: "13s", t: 13 },
-    { s: "15s", t: 15 }, { s: "20s", t: 20 }, { s: "25s", t: 25 }, { s: "30s", t: 30 }
+  { s: "1/8000", t: 1 / 8000 },
+  { s: "1/6400", t: 1 / 6400 },
+  { s: "1/5000", t: 1 / 5000 },
+  { s: "1/4000", t: 1 / 4000 },
+  { s: "1/3200", t: 1 / 3200 },
+  { s: "1/2500", t: 1 / 2500 },
+  { s: "1/2000", t: 1 / 2000 },
+  { s: "1/1600", t: 1 / 1600 },
+  { s: "1/1250", t: 1 / 1250 },
+  { s: "1/1000", t: 1 / 1000 },
+  { s: "1/800", t: 1 / 800 },
+  { s: "1/640", t: 1 / 640 },
+  { s: "1/500", t: 1 / 500 },
+  { s: "1/400", t: 1 / 400 },
+  { s: "1/320", t: 1 / 320 },
+  { s: "1/250", t: 1 / 250 },
+  { s: "1/200", t: 1 / 200 },
+  { s: "1/160", t: 1 / 160 },
+  { s: "1/125", t: 1 / 125 },
+  { s: "1/100", t: 1 / 100 },
+  { s: "1/80", t: 1 / 80 },
+  { s: "1/60", t: 1 / 60 },
+  { s: "1/50", t: 1 / 50 },
+  { s: "1/40", t: 1 / 40 },
+  { s: "1/30", t: 1 / 30 },
+  { s: "1/25", t: 1 / 25 },
+  { s: "1/20", t: 1 / 20 },
+  { s: "1/15", t: 1 / 15 },
+  { s: "1/13", t: 1 / 13 },
+  { s: "1/10", t: 1 / 10 },
+  { s: "1/8", t: 1 / 8 },
+  { s: "1/6", t: 1 / 6 },
+  { s: "1/5", t: 1 / 5 },
+  { s: "1/4", t: 1 / 4 },
+  { s: "0.3s", t: 0.3 },
+  { s: "0.4s", t: 0.4 },
+  { s: "0.5s", t: 0.5 },
+  { s: "0.6s", t: 0.6 },
+  { s: "0.8s", t: 0.8 },
+  { s: "1s", t: 1 },
+  { s: "1.3s", t: 1.3 },
+  { s: "1.6s", t: 1.6 },
+  { s: "2s", t: 2 },
+  { s: "2.5s", t: 2.5 },
+  { s: "3.2s", t: 3.2 },
+  { s: "4s", t: 4 },
+  { s: "5s", t: 5 },
+  { s: "6s", t: 6 },
+  { s: "8s", t: 8 },
+  { s: "10s", t: 10 },
+  { s: "13s", t: 13 },
+  { s: "15s", t: 15 },
+  { s: "20s", t: 20 },
+  { s: "25s", t: 25 },
+  { s: "30s", t: 30 },
 ];
 
 document
@@ -2472,52 +2525,109 @@ function calculateZonasExposure() {
   if (times.length === 0)
     return alert("Insira ao menos uma velocidade na área de fotometria.");
 
-  // EV = log2(1/T). Maior EV = Menos luz (mais rápido).
-  const maxEV = Math.log2(1 / minT); // Luz Alta (Ex: 1/500)
-  const minEV = Math.log2(1 / maxT); // Sombra (Ex: 1/2)
+  const maxEV = Math.log2(1 / minT); // Luz Alta
+  const minEV = Math.log2(1 / maxT); // Sombra
   const avgEV = (maxEV + minEV) / 2;
-
   const rangeStops = maxEV - minEV;
 
-  // Busca a velocidade real mais próxima para o centro
-  const targetT = 1 / Math.pow(2, avgEV);
-  let closestSpeed = stdZonasSpeeds[0];
-  let minDiff = Infinity;
+  // 1. Velocidade base da cena (Sem Filtro - Usada para a Régua e HDR)
+  const baseTargetT = 1 / Math.pow(2, avgEV);
+
+  let closestSpeedBase = stdZonasSpeeds[0];
+  let minDiffBase = Infinity;
   stdZonasSpeeds.forEach((sp) => {
-    const diff = Math.abs(sp.t - targetT);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closestSpeed = sp;
+    const diff = Math.abs(sp.t - baseTargetT);
+    if (diff < minDiffBase) {
+      minDiffBase = diff;
+      closestSpeedBase = sp;
     }
   });
 
-  // Exibição do "Zero" isolado para não sobrepor a régua
-  document.getElementById("zonas-exposure-result").style.display = "block";
-  document.getElementById("zonas-base-speed-val").innerText = closestSpeed.s;
+  // 2. Compensação do Filtro ND (Apenas para a saída da Câmera)
+  let targetT = baseTargetT;
+  const ndStops =
+    parseInt(document.getElementById("nd-filter-select").value) || 0;
+  if (ndStops > 0) {
+    targetT = baseTargetT * Math.pow(2, ndStops);
+  }
 
-  // Alerta visual de Dynamic Range
+  // 3. Formatação da velocidade final
+  let closestSpeedFinal = { s: "", t: targetT };
+
+  if (targetT > 30) {
+    if (targetT >= 60) {
+      closestSpeedFinal.s = Math.round(targetT / 60) + " min";
+    } else {
+      closestSpeedFinal.s = Math.round(targetT) + "s";
+    }
+  } else {
+    let minDiff = Infinity;
+    stdZonasSpeeds.forEach((sp) => {
+      const diff = Math.abs(sp.t - targetT);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestSpeedFinal = sp;
+      }
+    });
+  }
+
+  document.getElementById("zonas-exposure-result").style.display = "block";
+  document.getElementById("zonas-base-speed-val").innerText =
+    closestSpeedFinal.s;
+
+  // ----------------------------------------------------
+  // AVALIAÇÃO DE DISTÂNCIA E HDR (Usa a base SEM ND)
+  // ----------------------------------------------------
+  let maxEvDistance = 0;
+  times.forEach((pt) => {
+    // CORREÇÃO: Compara a leitura nua com o Ponto Zero original da cena
+    const meterPos = Math.abs(Math.log2(closestSpeedBase.t / pt.t));
+    if (meterPos > maxEvDistance) {
+      maxEvDistance = meterPos;
+    }
+  });
+
   const verdict = document.getElementById("zonas-verdict-box");
-  if (rangeStops <= 5) {
+
+  if (maxEvDistance <= 2.01) {
     verdict.className = "verdict ok";
     verdict.innerHTML = `✅ Cena Segura (${rangeStops.toFixed(
       1
-    )} stops).<br>Exposição única com a velocidade acima.`;
+    )} stops totais).<br>Nenhum ponto ultrapassa a marca de ±2 EV na régua.`;
   } else {
     verdict.className = "verdict hdr";
     verdict.innerHTML = `⚠️ Contraste Alto (${rangeStops.toFixed(
       1
-    )} stops).<br>Ultrapassa 5 pontos (clipagem provável). Recomenda-se Bracketing/HDR.`;
+    )} stops totais).<br>Existem pontos além do limite de ±2 EV. Exige HDR.`;
   }
 
-  // Plotação na Régua Virtual
+  // ----------------------------------------------------
+  // REGRA RECÍPROCA (Risco de Tremida - Usa a base COM ND)
+  // ----------------------------------------------------
+  const focalInput = document.getElementById("focal-length").value;
+  const focalLength = parseFloat(focalInput);
+
+  if (!isNaN(focalLength) && focalLength > 0) {
+    const limiteTremida = 1 / focalLength;
+    // Compara o limite com a velocidade final que vai para o obturador
+    if (closestSpeedFinal.t > limiteTremida) {
+      verdict.innerHTML += `
+          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.2); color: var(--accent-warning); font-size: 0.85rem; line-height: 1.4;">
+              ⚠️ <strong>Regra Recíproca Rompida:</strong> Sua velocidade (${closestSpeedFinal.s}) é mais lenta que o limite de segurança da sua lente (${focalLength}mm). <strong>Uso obrigatório de tripé.</strong>
+          </div>
+      `;
+    }
+  }
+
+  // ----------------------------------------------------
+  // PLOTAGEM DA RÉGUA VISUAL (Usa a base SEM ND)
+  // ----------------------------------------------------
   const layer = document.getElementById("zonas-meter-points-layer");
   layer.innerHTML = "";
 
   times.forEach((pt) => {
-    // Matemática do Fotômetro
-    const meterPos = Math.log2(closestSpeed.t / pt.t);
-
-    // Mapeamento percentual ( -3 a +3 na div de largura )
+    // CORREÇÃO: Plota o pino com base no contraste real da cena
+    const meterPos = Math.log2(closestSpeedBase.t / pt.t);
     let percentLeft = ((meterPos + 3) / 6) * 100;
 
     let isOut = false;
@@ -2532,13 +2642,16 @@ function calculateZonasExposure() {
 
     const div = document.createElement("div");
     div.className = "meter-point";
-    div.style.left = `calc(${percentLeft}%)`;
-    if (isOut) div.style.opacity = "0.4"; // Transparência se vazar o range
+
+    const proporcaoDecimal = percentLeft / 100;
+    div.style.left = `calc(10px + (100% - 20px) * ${proporcaoDecimal})`;
+
+    if (isOut) div.style.opacity = "0.4";
 
     div.innerHTML = `
-                    <div class="meter-point-label">${pt.name}</div>
-                    <div class="meter-point-dot"></div>
-                `;
+        <div class="meter-point-label">${pt.name}</div>
+        <div class="meter-point-dot"></div>
+    `;
     layer.appendChild(div);
   });
 }
